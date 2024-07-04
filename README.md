@@ -25,9 +25,105 @@
 
 프로젝트의 주요 [마일스톤](https://github.com/users/DongGunYoon/projects/2)은 다음과 같습니다.
 
-![ERD 다이어그램](asset/milestone_calendar.png)
+![Milestone](asset/milestone_calendar.png)
 
 ## ERD
+
+```mermaid
+erDiagram
+ UserEntity {
+ int id PK
+ string name
+ timestamptz createdAt
+ timestamptz updatedAt
+ }
+ UserQueueEntity {
+ int id PK
+ int userId FK
+ varchar token
+ timestamptz createdAt
+ timestamptz expiresAt
+ }
+ PointEntity {
+ int id PK
+ int userId FK
+ int amount
+ timestamptz createdAt
+ timestamptz updatedAt
+ }
+ PointHistoryEntity {
+ int id PK
+ int userId FK
+ int pointId FK
+ int amount
+ enum transactionType
+ timestamptz createdAt
+ }
+ ConcertEntity {
+ int id PK
+ string title
+ varchar description
+ timestamptz createdAt
+ timestamptz updatedAt
+ }
+ ConcertSeatEntity {
+ int id PK
+ int concertId FK
+ int concertScheduleId FK
+ int price
+ int number
+ enum status
+ timestamptz createdAt
+ timestamptz updatedAt
+ }
+ ConcertScheduleEntity {
+ int id PK
+ int concertId FK
+ timestamptz bookingStartAt
+ timestamptz bookingEndAt
+ timestamptz startAt
+ timestamptz endAt
+ timestamptz createdAt
+ timestamptz updatedAt
+ }
+ ConcertPaymentHistoryEntity {
+ int id PK
+ int userId FK
+ int concertId FK
+ int concertScheduleId FK
+ int concertSeatId FK
+ int concertBookingId FK
+ string concertTitle
+ int price
+ enum status
+ timestamptz createdAt
+ }
+ ConcertBookingEntity {
+ int id PK
+ int userId FK
+ int concertId FK
+ int concertScheduleId FK
+ int concertSeatId FK
+ enum status
+ timestamptz createdAt
+ timestamptz expiresAt
+ timestamptz updatedAt
+ }
+
+ UserEntity ||--|| PointEntity : has
+ UserEntity ||--o{ UserQueueEntity : has
+ UserEntity ||--o{ PointHistoryEntity : has
+ UserEntity ||--o{ ConcertBookingEntity : books
+ UserEntity ||--o{ ConcertPaymentHistoryEntity : pays
+
+ PointEntity ||--o{ PointHistoryEntity : has
+
+ ConcertEntity ||--o{ ConcertScheduleEntity : schedules
+ ConcertScheduleEntity ||--o{ ConcertSeatEntity : contains
+ ConcertSeatEntity ||--o{ ConcertBookingEntity : bookedFor
+ ConcertBookingEntity ||--o{ ConcertPaymentHistoryEntity : paidFor
+
+```
 
 ## 시퀀스 다이어그램
 
