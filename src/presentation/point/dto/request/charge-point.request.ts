@@ -1,4 +1,5 @@
 import { IsInt } from 'class-validator';
+import { ChargePointUseCaseDTO } from 'src/application/point/dto/charge-point.use-case.dto';
 
 export class ChargePointRequest {
   constructor(amount: number) {
@@ -7,4 +8,8 @@ export class ChargePointRequest {
 
   @IsInt()
   amount: number;
+
+  toUseCaseDTO(userId: number): ChargePointUseCaseDTO {
+    return new ChargePointUseCaseDTO(userId, this.amount);
+  }
 }
