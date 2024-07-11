@@ -1,8 +1,8 @@
-export interface UserPayload {
+export interface UserTokenPayload {
   userId: number;
 }
 
-export interface UserQueuePayload {
+export interface UserQueueTokenPayload {
   userId: number;
   userQueueId: number;
 }
