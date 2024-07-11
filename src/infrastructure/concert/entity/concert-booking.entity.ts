@@ -1,5 +1,7 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { ConcertBookingStatus } from 'src/domain/concert/enum/concert.enum';
+import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
+@Index('unique_pending_booking', ['concertSeatId'], { where: "status = 'PENDING'", unique: true })
 @Entity('concert_bookings')
 export class ConcertBookingEntity {
   @PrimaryGeneratedColumn()
@@ -17,8 +19,11 @@ export class ConcertBookingEntity {
   @Column({ name: 'concert_seat_id' })
   concertSeatId: number;
 
-  @Column({ type: 'enum', enum: [`PENDING`, `COMPLETED`, `CANCELLED`, 'EXPIRED'] })
-  status: `PENDING` | `COMPLETED` | `CANCELLED` | 'EXPIRED';
+  @Column()
+  price: number;
+
+  @Column({ type: 'enum', enum: ConcertBookingStatus })
+  status: ConcertBookingStatus;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;

@@ -1,7 +1,8 @@
+import { ConcertPaymentType } from 'src/domain/concert/enum/concert.enum';
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('concert_payment_histories')
-export class ConcertPaymentHistoryEntity {
+export class ConcertPaymentEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -20,14 +21,11 @@ export class ConcertPaymentHistoryEntity {
   @Column({ name: 'concert_booking_id' })
   concertBookingId: number;
 
-  @Column({ name: 'concert_title', length: 200 })
-  concertTitle: string;
-
   @Column()
   price: number;
 
-  @Column({ type: 'enum', enum: [`BUY`, `REFUND`] })
-  type: 'BUY' | 'REFUND';
+  @Column({ type: 'enum', enum: ConcertPaymentType })
+  type: ConcertPaymentType;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;

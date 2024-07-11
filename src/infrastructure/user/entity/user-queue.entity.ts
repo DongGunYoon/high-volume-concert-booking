@@ -15,6 +15,6 @@ export class UserQueueEntity {
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
 
-  @Column({ name: 'expires_at', type: 'timestamptz' })
+  @Column({ name: 'expires_at', nullable: true, type: 'timestamptz' })
   expiresAt: Nullable<Date>;
 }

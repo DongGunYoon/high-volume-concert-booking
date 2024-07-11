@@ -5,9 +5,10 @@ import { ConcertModule } from './presentation/concert/concert.module';
 import { UserModule } from './presentation/user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './domain/auth/auth.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), DatabaseModule, ConcertModule, PointModule, UserModule, AuthModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), ScheduleModule.forRoot(), DatabaseModule, ConcertModule, PointModule, UserModule, AuthModule],
   controllers: [],
   providers: [],
 })

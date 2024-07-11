@@ -11,7 +11,7 @@ export function getPgTestTypeOrmModule() {
     username: 'root',
     password: 'password',
     database: 'high-volume-concert-booking-test',
-    entities: [path.join(rootDir, 'src', '**', '*.entity.{ts,js}')],
+    entities: [path.join(rootDir, '**', '*.entity.{ts,js}')],
     synchronize: true,
   });
 }

@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { ConcertEntity } from './concert.entity';
 
 @Entity('concert_schedules')
 export class ConcertScheduleEntity {
@@ -25,4 +26,8 @@ export class ConcertScheduleEntity {
 
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
   updatedAt: Date;
+
+  @ManyToOne(() => ConcertEntity, { createForeignKeyConstraints: false })
+  @JoinColumn({ name: 'concert_id' })
+  concert?: ConcertEntity;
 }

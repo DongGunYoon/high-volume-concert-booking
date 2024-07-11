@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { UserEntity } from 'src/infrastructure/user/entity/user.entity';
+import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('points')
 export class PointEntity {
@@ -16,4 +17,8 @@ export class PointEntity {
 
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
   updatedAt: Date;
+
+  @OneToOne(() => UserEntity, { createForeignKeyConstraints: false })
+  @JoinColumn({ name: 'user_id' })
+  user?: UserEntity;
 }

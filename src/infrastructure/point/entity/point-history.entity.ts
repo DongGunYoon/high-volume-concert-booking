@@ -1,3 +1,4 @@
+import { PointTransactionType } from 'src/domain/point/enum/point.enum';
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('point_histories')
@@ -14,8 +15,8 @@ export class PointHistoryEntity {
   @Column()
   amount: number;
 
-  @Column({ type: 'enum', enum: [`CHARGE`, `USE`, `REFUND`] })
-  transactionType: `CHARGE` | `USE` | `REFUND`;
+  @Column({ type: 'enum', enum: PointTransactionType })
+  transactionType: PointTransactionType;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
