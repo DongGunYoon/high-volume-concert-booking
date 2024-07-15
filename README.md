@@ -6,11 +6,11 @@
 
 ## 주요 기능
 
-대기열 시스템: 동시성 문제 해결을 위한 유저 대기열 관리
-예약 기능: 예약 가능 날짜 및 좌석 조회, 좌석 예약 요청
-결제 기능: 예약된 좌석에 대한 결제 처리
-사용자 인증: JWT 기반 사용자 인증
-포인트 관리: 잔액 충전 및 조회 기능
+- 대기열 시스템: 동시성 문제 해결을 위한 유저 대기열 관리
+- 예약 기능: 예약 가능 날짜 및 좌석 조회, 좌석 예약 요청
+- 결제 기능: 예약된 좌석에 대한 결제 처리
+- 사용자 인증: JWT 기반 사용자 인증
+- 포인트 관리: 잔액 충전 및 조회 기능
 
 ## 기술 스택
 
@@ -83,16 +83,6 @@ erDiagram
  timestamptz createdAt
  timestamptz updatedAt
  }
- ConcertSeatEntity {
- int id PK
- int concertId FK
- int concertScheduleId FK
- int price
- int number
- enum status
- timestamptz createdAt
- timestamptz updatedAt
- }
  ConcertScheduleEntity {
  int id PK
  int concertId FK
@@ -103,16 +93,26 @@ erDiagram
  timestamptz createdAt
  timestamptz updatedAt
  }
- ConcertPaymentHistoryEntity {
+ ConcertSeatEntity {
+ int id PK
+ int concertId FK
+ int concertScheduleId FK
+ int price
+ int number
+ boolean isPaid
+ timestamptz reservedUntil
+ timestamptz createdAt
+ timestamptz updatedAt
+ }
+ ConcertPaymentEntity {
  int id PK
  int userId FK
  int concertId FK
  int concertScheduleId FK
  int concertSeatId FK
  int concertBookingId FK
- varchar concertTitle
  int price
- enum status
+ enum type
  timestamptz createdAt
  }
  ConcertBookingEntity {
@@ -121,9 +121,10 @@ erDiagram
  int concertId FK
  int concertScheduleId FK
  int concertSeatId FK
- enum status
- timestamptz createdAt
+ int price
+ boolean isPaid
  timestamptz expiresAt
+ timestamptz createdAt
  timestamptz updatedAt
  }
 
@@ -131,14 +132,14 @@ erDiagram
  UserEntity ||--o{ UserQueueEntity : has
  UserEntity ||--o{ PointHistoryEntity : has
  UserEntity ||--o{ ConcertBookingEntity : books
- UserEntity ||--o{ ConcertPaymentHistoryEntity : pays
+ UserEntity ||--o{ ConcertPaymentEntity : pays
 
  PointEntity ||--o{ PointHistoryEntity : has
 
  ConcertEntity ||--o{ ConcertScheduleEntity : schedules
  ConcertScheduleEntity ||--o{ ConcertSeatEntity : contains
  ConcertSeatEntity ||--o{ ConcertBookingEntity : bookedFor
- ConcertBookingEntity ||--o{ ConcertPaymentHistoryEntity : paidFor
+ ConcertBookingEntity ||--o{ ConcertPaymentEntity : paidFor
 
 ```
 
