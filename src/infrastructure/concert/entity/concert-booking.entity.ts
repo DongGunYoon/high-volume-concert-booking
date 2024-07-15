@@ -1,7 +1,6 @@
-import { ConcertBookingStatus } from 'src/domain/concert/enum/concert.enum';
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
-@Index('unique_pending_booking', ['concertSeatId'], { where: "status = 'PENDING'", unique: true })
+@Index('unique_pending_booking', ['concertSeatId'], { where: "'isPaid' = 'true'", unique: true })
 @Entity('concert_bookings')
 export class ConcertBookingEntity {
   @PrimaryGeneratedColumn()
@@ -22,8 +21,8 @@ export class ConcertBookingEntity {
   @Column()
   price: number;
 
-  @Column({ type: 'enum', enum: ConcertBookingStatus })
-  status: ConcertBookingStatus;
+  @Column({ name: 'is_paid' })
+  isPaid: boolean;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;

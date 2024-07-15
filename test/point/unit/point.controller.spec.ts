@@ -1,12 +1,12 @@
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
-import { UserAuthGuard } from 'src/domain/auth/guard/auth.guard';
+import { UserAuthGuard } from 'src/common/guard/auth.guard';
 import { ChargePointUseCase, ChargePointUseCaseSymbol } from 'src/domain/point/interface/use-case/charge-point.use-case';
 import { ReadPointUseCase, ReadPointUseCaseSymbol } from 'src/domain/point/interface/use-case/read-point.use-case';
 import { Point } from 'src/domain/point/model/point.domain';
-import { PointController } from 'src/presentation/point/controller/point.controller';
-import { ChargePointRequest } from 'src/presentation/point/dto/request/charge-point.request';
-import { PointResponse } from 'src/presentation/point/dto/response/point.response';
+import { PointController } from 'src/interface/presentation/point/controller/point.controller';
+import { ChargePointRequest } from 'src/interface/presentation/point/dto/request/charge-point.request';
+import { PointResponse } from 'src/interface/presentation/point/dto/response/point.response';
 
 describe('PointController', () => {
   let pointController: PointController;

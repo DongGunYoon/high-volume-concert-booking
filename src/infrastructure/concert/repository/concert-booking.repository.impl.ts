@@ -6,7 +6,7 @@ import { ConcertBookingMapper } from '../mapper/concert-booking.mapper';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConcertBookingEntity } from '../entity/concert-booking.entity';
 import { Nullable } from 'src/common/type/native';
-import { CustomLock } from 'src/domain/database/interface/lock.interface';
+import { CustomLock } from 'src/common/interface/database.interface';
 
 @Injectable()
 export class ConcertBookingRepositoryImpl implements ConcertBookingRepository {

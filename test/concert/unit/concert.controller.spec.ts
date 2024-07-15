@@ -1,7 +1,7 @@
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
-import { UserQueueAuthGuard } from 'src/domain/auth/guard/auth.guard';
-import { ConcertBookingStatus, ConcertPaymentType, ConcertSeatStatus } from 'src/domain/concert/enum/concert.enum';
+import { UserQueueAuthGuard } from 'src/common/guard/auth.guard';
+import { ConcertPaymentType } from 'src/domain/concert/enum/concert.enum';
 import { BookConcertSeatUseCase, BookConcertSeatUseCaseSymbol } from 'src/domain/concert/interface/use-case/book-concert-seat.use-case';
 import { PayConcertBookingUseCase, PayConcertBookingUseCaseSymbol } from 'src/domain/concert/interface/use-case/pay-concert-booking.use-case';
 import { ScanBookableSchedulesUseCase, ScanBookableSchedulesUseCaseSymbol } from 'src/domain/concert/interface/use-case/scan-bookable-schedules.use-case';
@@ -11,13 +11,13 @@ import { ConcertPayment } from 'src/domain/concert/model/concert-payment.domain'
 import { ConcertSchedule } from 'src/domain/concert/model/concert-schedule.domain';
 import { ConcertSeat } from 'src/domain/concert/model/concert-seat.domain';
 import { Concert } from 'src/domain/concert/model/concert.domain';
-import { ConcertController } from 'src/presentation/concert/controller/concert.controller';
-import { BookConcertSeatRequest } from 'src/presentation/concert/dto/request/book-concert-seat.request';
-import { PayConcertBookingRequest } from 'src/presentation/concert/dto/request/pay-concert-booking.request';
-import { ConcertBookingResponse } from 'src/presentation/concert/dto/response/concert-booking.response';
-import { ConcertPaymentResponse } from 'src/presentation/concert/dto/response/concert-payment.response';
-import { ConcertScheduleResponse } from 'src/presentation/concert/dto/response/concert-schedule.response';
-import { ConcertSeatResponse } from 'src/presentation/concert/dto/response/concert-seat.response';
+import { ConcertController } from 'src/interface/presentation/concert/controller/concert.controller';
+import { BookConcertSeatRequest } from 'src/interface/presentation/concert/dto/request/book-concert-seat.request';
+import { PayConcertBookingRequest } from 'src/interface/presentation/concert/dto/request/pay-concert-booking.request';
+import { ConcertBookingResponse } from 'src/interface/presentation/concert/dto/response/concert-booking.response';
+import { ConcertPaymentResponse } from 'src/interface/presentation/concert/dto/response/concert-payment.response';
+import { ConcertScheduleResponse } from 'src/interface/presentation/concert/dto/response/concert-schedule.response';
+import { ConcertSeatResponse } from 'src/interface/presentation/concert/dto/response/concert-seat.response';
 
 describe('ConcertController', () => {
   let concertController: ConcertController;
@@ -69,7 +69,7 @@ describe('ConcertController', () => {
   describe('예약 가능 콘서트 좌석 조회', () => {
     it('예약 가능한 콘서트 좌석을 조회합니다.', async () => {
       // Given
-      const concertSeats = [new ConcertSeat(1, 1, 1, 1000, 1, ConcertSeatStatus.AVAILABLE)];
+      const concertSeats = [new ConcertSeat(1, 1, 1, 1000, 1, false, null)];
       jest.spyOn(scanConcertSeatsUseCase, 'execute').mockResolvedValue(concertSeats);
 
       // When
@@ -86,7 +86,7 @@ describe('ConcertController', () => {
   describe('콘서트 좌석 예약 요청', () => {
     it('콘서트 좌석을 예약합니다.', async () => {
       // Given
-      const concertBooking = new ConcertBooking(1, 1, 1, 1, 1, 1000, ConcertBookingStatus.PENDING, new Date());
+      const concertBooking = new ConcertBooking(1, 1, 1, 1, 1, 1000, false, new Date());
       jest.spyOn(bookConcertSeatUseCase, 'execute').mockResolvedValue(concertBooking);
 
       // When
@@ -96,7 +96,7 @@ describe('ConcertController', () => {
       expect(response).toBeInstanceOf(ConcertBookingResponse);
       expect(response.concertSeatId).toBe(1);
       expect(response.price).toBe(1000);
-      expect(response.status).toBe(ConcertBookingStatus.PENDING);
+      expect(response.isPaid).toBe(false);
       expect(response.expiresAt).toBe(concertBooking.expiresAt);
     });
   });

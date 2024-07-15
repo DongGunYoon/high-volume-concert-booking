@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { ConcertScheduleEntity } from './concert-schedule.entity';
-import { ConcertSeatStatus } from 'src/domain/concert/enum/concert.enum';
+import { Nullable } from 'src/common/type/native';
 
 @Entity('concert_seats')
 export class ConcertSeatEntity {
@@ -19,8 +19,11 @@ export class ConcertSeatEntity {
   @Column()
   number: number;
 
-  @Column({ type: 'enum', enum: ConcertSeatStatus })
-  status: ConcertSeatStatus;
+  @Column({ name: 'is_paid' })
+  isPaid: boolean;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  reservedUntil: Nullable<Date>;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;

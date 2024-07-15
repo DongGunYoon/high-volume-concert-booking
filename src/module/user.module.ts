@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { UserController } from './controller/user.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from 'src/infrastructure/user/entity/user.entity';
 import { UserQueueService } from 'src/domain/user/service/user-queue.service';
@@ -8,7 +7,8 @@ import { UserQueueRepositoryImpl } from 'src/infrastructure/user/repository/user
 import { UserQueueEntity } from 'src/infrastructure/user/entity/user-queue.entity';
 import { EnqueueUserQueueUseCaseSymbol } from 'src/domain/user/interface/use-case/enqueue-user-queue.use-case';
 import { EnqueueUserQueueUseCaseImpl } from 'src/application/user/use-case/enqueue-user-queue.use-case.impl';
-import { UserQueueScheduler } from 'src/application/user/user-queue.scheduler';
+import { UserController } from 'src/interface/presentation/user/controller/user.controller';
+import { UserQueueScheduler } from 'src/interface/scheduler/user-queue.scheduler';
 
 @Module({
   imports: [TypeOrmModule.forFeature([UserEntity, UserQueueEntity])],

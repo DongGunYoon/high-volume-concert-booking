@@ -3,7 +3,7 @@ import { BookConcertSeatUseCaseDTO } from 'src/application/concert/dto/book-conc
 import { BookConcertSeatUseCase } from 'src/domain/concert/interface/use-case/book-concert-seat.use-case';
 import { ConcertBooking } from 'src/domain/concert/model/concert-booking.domain';
 import { ConcertService } from 'src/domain/concert/service/concert.service';
-import { PessimisticLockMode } from 'src/domain/database/enum/lock-mode.enum';
+import { PessimisticLockMode } from 'src/common/enum/database.enum';
 import { DataSource } from 'typeorm';
 
 @Injectable()

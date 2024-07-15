@@ -1,8 +1,8 @@
 import { Test } from '@nestjs/testing';
-import { UserController } from '../../../src/presentation/user/controller/user.controller';
-import { UserQueueResponse } from '../../../src/presentation/user/dto/response/user-queue.response';
+import { UserController } from '../../../src/interface/presentation/user/controller/user.controller';
+import { UserQueueResponse } from '../../../src/interface/presentation/user/dto/response/user-queue.response';
 import { EnqueueUserQueueUseCase, EnqueueUserQueueUseCaseSymbol } from 'src/domain/user/interface/use-case/enqueue-user-queue.use-case';
-import { UserAuthGuard } from 'src/domain/auth/guard/auth.guard';
+import { UserAuthGuard } from 'src/common/guard/auth.guard';
 import { UserQueue } from 'src/domain/user/model/user-queue.domain';
 import { JwtService } from '@nestjs/jwt';
 

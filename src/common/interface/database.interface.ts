@@ -1,4 +1,4 @@
-import { OptimisticLockMode, PessimisticLockMode } from '../enum/lock-mode.enum';
+import { OptimisticLockMode, PessimisticLockMode } from '../enum/database.enum';
 
 export type CustomLock = CustomOptimisticLock | CustomPessimisticLock;
 

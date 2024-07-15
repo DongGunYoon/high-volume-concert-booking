@@ -1,6 +1,6 @@
 import { EntityManager } from 'typeorm';
 import { ConcertSeat } from '../../model/concert-seat.domain';
-import { CustomLock } from 'src/domain/database/interface/lock.interface';
+import { CustomLock } from 'src/common/interface/database.interface';
 import { Nullable } from 'src/common/type/native';
 
 export const ConcertSeatRepositorySymbol = Symbol.for('ConcertSeatRepository');

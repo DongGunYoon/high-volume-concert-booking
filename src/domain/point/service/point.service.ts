@@ -6,7 +6,7 @@ import { Point } from '../model/point.domain';
 import { ChargePointDTO, PayPointDTO } from '../dto/charge-point.dto';
 import { CreatePointHistoryDTO } from '../dto/create-point-history.dto';
 import { PointHistory } from '../model/point-history.domain';
-import { CustomLock } from 'src/domain/database/interface/lock.interface';
+import { CustomLock } from 'src/common/interface/database.interface';
 import { PointTransactionType } from '../enum/point.enum';
 
 @Injectable()

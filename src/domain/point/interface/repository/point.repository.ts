@@ -1,7 +1,7 @@
 import { Nullable } from 'src/common/type/native';
 import { EntityManager } from 'typeorm';
 import { Point } from '../../model/point.domain';
-import { CustomLock } from 'src/domain/database/interface/lock.interface';
+import { CustomLock } from 'src/common/interface/database.interface';
 
 export const PointRepositorySymbol = Symbol.for('PointRepository');
 

@@ -1,12 +1,12 @@
 import { Body, Controller, Get, Inject, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { TokenPayload } from 'src/domain/auth/decorator/auth.decorator';
-import { UserTokenPayload } from 'src/domain/auth/interface/auth.interface';
-import { UserAuthGuard } from 'src/domain/auth/guard/auth.guard';
+import { TokenPayload } from 'src/common/decorator/auth.decorator';
+import { UserTokenPayload } from 'src/common/interface/auth.interface';
+import { UserAuthGuard } from 'src/common/guard/auth.guard';
 import { ChargePointUseCase, ChargePointUseCaseSymbol } from 'src/domain/point/interface/use-case/charge-point.use-case';
-import { ChargePointRequest } from 'src/presentation/point/dto/request/charge-point.request';
-import { PointResponse } from 'src/presentation/point/dto/response/point.response';
 import { ReadPointUseCase, ReadPointUseCaseSymbol } from 'src/domain/point/interface/use-case/read-point.use-case';
+import { ChargePointRequest } from '../dto/request/charge-point.request';
+import { PointResponse } from '../dto/response/point.response';
 
 @ApiTags('포인트 관련 API')
 @Controller('points')

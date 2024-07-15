@@ -4,7 +4,7 @@ import { PayConcertBookingUseCase } from 'src/domain/concert/interface/use-case/
 import { ConcertPayment } from 'src/domain/concert/model/concert-payment.domain';
 import { ConcertService } from 'src/domain/concert/service/concert.service';
 import { PaymentService } from 'src/domain/concert/service/payment.service';
-import { PessimisticLockMode } from 'src/domain/database/enum/lock-mode.enum';
+import { PessimisticLockMode } from 'src/common/enum/database.enum';
 import { PointService } from 'src/domain/point/service/point.service';
 import { UserQueueService } from 'src/domain/user/service/user-queue.service';
 import { DataSource } from 'typeorm';

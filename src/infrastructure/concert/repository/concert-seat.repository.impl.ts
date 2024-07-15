@@ -6,7 +6,7 @@ import { ConcertSeatEntity } from '../entity/concert-seat.entity';
 import { EntityManager, Repository } from 'typeorm';
 import { ConcertSeatMapper } from '../mapper/concert-seat.mapper';
 import { Nullable } from 'src/common/type/native';
-import { CustomLock } from 'src/domain/database/interface/lock.interface';
+import { CustomLock } from 'src/common/interface/database.interface';
 
 @Injectable()
 export class ConcertSeatRepositoryImpl implements ConcertSeatRepository {

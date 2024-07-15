@@ -1,8 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 import { PayConcertBookingUseCaseDTO } from 'src/application/concert/dto/pay-concert-booking.use-case.dto';
-import { AuthModule } from 'src/domain/auth/auth.module';
-import { ConcertBookingStatus, ConcertSeatStatus } from 'src/domain/concert/enum/concert.enum';
 import { PayConcertBookingUseCase, PayConcertBookingUseCaseSymbol } from 'src/domain/concert/interface/use-case/pay-concert-booking.use-case';
 import { ConcertBooking } from 'src/domain/concert/model/concert-booking.domain';
 import { ConcertPayment } from 'src/domain/concert/model/concert-payment.domain';
@@ -19,13 +17,14 @@ import { ConcertBookingMapper } from 'src/infrastructure/concert/mapper/concert-
 import { ConcertScheduleMapper } from 'src/infrastructure/concert/mapper/concert-schedule.mapper';
 import { ConcertSeatMapper } from 'src/infrastructure/concert/mapper/concert-seat.mapper';
 import { ConcertMapper } from 'src/infrastructure/concert/mapper/concert.mapper';
-import { getPgTestTypeOrmModule } from 'src/infrastructure/database/utils/get-test-typeorm.module';
+import { TestTypeORMConfig } from 'src/infrastructure/database/config/test-typeorm.config';
 import { PointEntity } from 'src/infrastructure/point/entity/point.entity';
 import { UserEntity } from 'src/infrastructure/user/entity/user.entity';
 import { UserMapper } from 'src/infrastructure/user/mapper/user.mapper';
-import { ConcertModule } from 'src/presentation/concert/concert.module';
-import { PointModule } from 'src/presentation/point/point.module';
-import { UserModule } from 'src/presentation/user/user.module';
+import { AuthModule } from 'src/module/auth.module';
+import { ConcertModule } from 'src/module/concert.module';
+import { PointModule } from 'src/module/point.module';
+import { UserModule } from 'src/module/user.module';
 import { Repository } from 'typeorm';
 
 describe('PayConcertBookingUseCase', () => {
@@ -40,7 +39,7 @@ describe('PayConcertBookingUseCase', () => {
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
-      imports: [getPgTestTypeOrmModule(), ConcertModule, AuthModule, PointModule, UserModule],
+      imports: [TypeOrmModule.forRoot(TestTypeORMConfig), ConcertModule, AuthModule, PointModule, UserModule],
     }).compile();
 
     payConcertBookingUseCase = module.get<PayConcertBookingUseCase>(PayConcertBookingUseCaseSymbol);
@@ -128,10 +127,10 @@ describe('PayConcertBookingUseCase', () => {
       ConcertScheduleMapper.toEntity(new ConcertSchedule(0, concert.id, pastDate, futureDate, futureDate, futureDate)),
     );
     const concertSeat = await concertSeatRepository.save(
-      ConcertSeatMapper.toEntity(new ConcertSeat(0, concert.id, concertSchedule.id, 10000, 1, ConcertSeatStatus.RESERVED)),
+      ConcertSeatMapper.toEntity(new ConcertSeat(0, concert.id, concertSchedule.id, 10000, 1, false, futureDate)),
     );
     const concertBooking = ConcertBookingMapper.toEntity(
-      new ConcertBooking(0, userId, concert.id, concertSchedule.id, concertSeat.id, concertSeat.price, ConcertBookingStatus.PENDING, futureDate),
+      new ConcertBooking(0, userId, concert.id, concertSchedule.id, concertSeat.id, concertSeat.price, false, futureDate),
     );
 
     return ConcertBookingMapper.toDomain(await concertBookingRepository.save(concertBooking));

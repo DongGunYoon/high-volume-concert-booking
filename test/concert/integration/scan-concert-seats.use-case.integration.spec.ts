@@ -1,7 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { AuthModule } from 'src/domain/auth/auth.module';
-import { ConcertSeatStatus } from 'src/domain/concert/enum/concert.enum';
+import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 import { ScanConcertSeatsUseCase, ScanConcertSeatsUseCaseSymbol } from 'src/domain/concert/interface/use-case/scan-concert-seats.use-case';
 import { ConcertSchedule } from 'src/domain/concert/model/concert-schedule.domain';
 import { ConcertSeat } from 'src/domain/concert/model/concert-seat.domain';
@@ -12,8 +10,9 @@ import { ConcertEntity } from 'src/infrastructure/concert/entity/concert.entity'
 import { ConcertScheduleMapper } from 'src/infrastructure/concert/mapper/concert-schedule.mapper';
 import { ConcertSeatMapper } from 'src/infrastructure/concert/mapper/concert-seat.mapper';
 import { ConcertMapper } from 'src/infrastructure/concert/mapper/concert.mapper';
-import { getPgTestTypeOrmModule } from 'src/infrastructure/database/utils/get-test-typeorm.module';
-import { ConcertModule } from 'src/presentation/concert/concert.module';
+import { TestTypeORMConfig } from 'src/infrastructure/database/config/test-typeorm.config';
+import { AuthModule } from 'src/module/auth.module';
+import { ConcertModule } from 'src/module/concert.module';
 import { Repository } from 'typeorm';
 
 describe('ScanConcertSeatsUseCase', () => {
@@ -25,7 +24,7 @@ describe('ScanConcertSeatsUseCase', () => {
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
-      imports: [getPgTestTypeOrmModule(), ConcertModule, AuthModule],
+      imports: [TypeOrmModule.forRoot(TestTypeORMConfig), ConcertModule, AuthModule],
     }).compile();
 
     scanConcertSeatsUseCase = module.get<ScanConcertSeatsUseCase>(ScanConcertSeatsUseCaseSymbol);
@@ -86,7 +85,7 @@ describe('ScanConcertSeatsUseCase', () => {
   };
 
   const createSeat = async (concertId: number, concertSeatId: number): Promise<ConcertSeat> => {
-    const concertSeat = ConcertSeatMapper.toEntity(new ConcertSeat(0, concertId, concertSeatId, 10000, 1, ConcertSeatStatus.AVAILABLE));
+    const concertSeat = ConcertSeatMapper.toEntity(new ConcertSeat(0, concertId, concertSeatId, 10000, 1, false, null));
 
     return ConcertSeatMapper.toDomain(await concertSeatRepository.save(concertSeat));
   };

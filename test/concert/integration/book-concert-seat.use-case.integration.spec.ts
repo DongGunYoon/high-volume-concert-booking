@@ -1,8 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 import { BookConcertSeatUseCaseDTO } from 'src/application/concert/dto/book-concert-seat.use-case.dto';
-import { AuthModule } from 'src/domain/auth/auth.module';
-import { ConcertSeatStatus } from 'src/domain/concert/enum/concert.enum';
+import { Nullable } from 'src/common/type/native';
 import { BookConcertSeatUseCase, BookConcertSeatUseCaseSymbol } from 'src/domain/concert/interface/use-case/book-concert-seat.use-case';
 import { ConcertBooking } from 'src/domain/concert/model/concert-booking.domain';
 import { ConcertSchedule } from 'src/domain/concert/model/concert-schedule.domain';
@@ -15,10 +14,11 @@ import { ConcertEntity } from 'src/infrastructure/concert/entity/concert.entity'
 import { ConcertScheduleMapper } from 'src/infrastructure/concert/mapper/concert-schedule.mapper';
 import { ConcertSeatMapper } from 'src/infrastructure/concert/mapper/concert-seat.mapper';
 import { ConcertMapper } from 'src/infrastructure/concert/mapper/concert.mapper';
-import { getPgTestTypeOrmModule } from 'src/infrastructure/database/utils/get-test-typeorm.module';
+import { TestTypeORMConfig } from 'src/infrastructure/database/config/test-typeorm.config';
 import { UserEntity } from 'src/infrastructure/user/entity/user.entity';
 import { UserMapper } from 'src/infrastructure/user/mapper/user.mapper';
-import { ConcertModule } from 'src/presentation/concert/concert.module';
+import { AuthModule } from 'src/module/auth.module';
+import { ConcertModule } from 'src/module/concert.module';
 import { Repository } from 'typeorm';
 
 describe('BookConcertSeatUseCase', () => {
@@ -31,7 +31,7 @@ describe('BookConcertSeatUseCase', () => {
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
-      imports: [getPgTestTypeOrmModule(), ConcertModule, AuthModule],
+      imports: [TypeOrmModule.forRoot(TestTypeORMConfig), ConcertModule, AuthModule],
     }).compile();
 
     bookConcertSeatUseCase = module.get<BookConcertSeatUseCase>(BookConcertSeatUseCaseSymbol);
@@ -50,7 +50,7 @@ describe('BookConcertSeatUseCase', () => {
       // Given
       const user = await createUser('예약자');
       const schedule = await createBookableSchedule();
-      const seat = await createSeat(schedule.concertId, schedule.id, ConcertSeatStatus.AVAILABLE);
+      const seat = await createSeat(schedule.concertId, schedule.id, false, null);
 
       // When
       const concertBooking = await bookConcertSeatUseCase.execute(new BookConcertSeatUseCaseDTO(user.id, seat.concertScheduleId, seat.id));
@@ -65,7 +65,7 @@ describe('BookConcertSeatUseCase', () => {
       // Given
       const user = await createUser('예약자');
       const schedule = await createNonBookableSchedule();
-      const seat = await createSeat(schedule.concertId, schedule.id, ConcertSeatStatus.AVAILABLE);
+      const seat = await createSeat(schedule.concertId, schedule.id, false, null);
 
       // When
       const book = async () => await bookConcertSeatUseCase.execute(new BookConcertSeatUseCaseDTO(user.id, seat.concertScheduleId, seat.id));
@@ -78,26 +78,26 @@ describe('BookConcertSeatUseCase', () => {
       // Given
       const user = await createUser('예약자');
       const schedule = await createBookableSchedule();
-      const seat = await createSeat(schedule.concertId, schedule.id, ConcertSeatStatus.RESERVED);
+      const seat = await createSeat(schedule.concertId, schedule.id, false, new Date(Date.now() + 10000));
 
       // When
       const book = async () => await bookConcertSeatUseCase.execute(new BookConcertSeatUseCaseDTO(user.id, seat.concertScheduleId, seat.id));
 
       // Then
-      await expect(book).rejects.toThrow('선택한 콘서트 좌석은 이미 예약/판매되었습니다.');
+      await expect(book).rejects.toThrow('선택한 콘서트 좌석은 이미 예약되었습니다.');
     });
 
     it('이미 좌석이 구매되었다면, 에러가 발생합니다.', async () => {
       // Given
       const user = await createUser('예약자');
       const schedule = await createBookableSchedule();
-      const seat = await createSeat(schedule.concertId, schedule.id, ConcertSeatStatus.PURCHASED);
+      const seat = await createSeat(schedule.concertId, schedule.id, true, new Date());
 
       // When
       const book = async () => await bookConcertSeatUseCase.execute(new BookConcertSeatUseCaseDTO(user.id, seat.concertScheduleId, seat.id));
 
       // Then
-      await expect(book).rejects.toThrow('선택한 콘서트 좌석은 이미 예약/판매되었습니다.');
+      await expect(book).rejects.toThrow('선택한 콘서트 좌석은 이미 판매되었습니다.');
     });
   });
 
@@ -124,8 +124,8 @@ describe('BookConcertSeatUseCase', () => {
     return ConcertScheduleMapper.toDomain(await concertScheduleRepository.save(concertSchedule));
   };
 
-  const createSeat = async (concertId: number, concertScheduleId: number, status: ConcertSeatStatus): Promise<ConcertSeat> => {
-    const concertSeat = ConcertSeatMapper.toEntity(new ConcertSeat(0, concertId, concertScheduleId, 10000, 1, status));
+  const createSeat = async (concertId: number, concertScheduleId: number, isPaid: boolean, reservedUntil: Nullable<Date>): Promise<ConcertSeat> => {
+    const concertSeat = ConcertSeatMapper.toEntity(new ConcertSeat(0, concertId, concertScheduleId, 10000, 1, isPaid, reservedUntil));
 
     return ConcertSeatMapper.toDomain(await concertSeatRepository.save(concertSeat));
   };

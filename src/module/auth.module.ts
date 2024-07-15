@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { UserModule } from 'src/presentation/user/user.module';
-import { UserAuthGuard, UserQueueAuthGuard } from './guard/auth.guard';
+import { UserAuthGuard, UserQueueAuthGuard } from '../common/guard/auth.guard';
+import { UserModule } from 'src/module/user.module';
 
 @Module({
   imports: [UserModule, JwtModule.register({ global: true })],

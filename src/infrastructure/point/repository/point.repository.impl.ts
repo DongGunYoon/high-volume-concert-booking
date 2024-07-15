@@ -5,7 +5,7 @@ import { Point } from 'src/domain/point/model/point.domain';
 import { EntityManager, Repository } from 'typeorm';
 import { PointEntity } from '../entity/point.entity';
 import { PointMapper } from '../mapper/point.mapper';
-import { CustomLock } from 'src/domain/database/interface/lock.interface';
+import { CustomLock } from 'src/common/interface/database.interface';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()

@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { PointController } from './controller/point.controller';
 import { ChargePointUseCaseImpl } from 'src/application/point/use-case/charge-point.use-case.impl';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PointEntity } from 'src/infrastructure/point/entity/point.entity';
@@ -12,6 +11,7 @@ import { PointHistoryEntity } from 'src/infrastructure/point/entity/point-histor
 import { ReadPointUseCaseSymbol } from 'src/domain/point/interface/use-case/read-point.use-case';
 import { ReadPointUseCaseImpl } from 'src/application/point/use-case/read-point.use-case.impl';
 import { PointService } from 'src/domain/point/service/point.service';
+import { PointController } from 'src/interface/presentation/point/controller/point.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([PointEntity, PointHistoryEntity])],

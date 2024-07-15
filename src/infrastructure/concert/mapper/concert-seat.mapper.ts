@@ -10,7 +10,8 @@ export class ConcertSeatMapper {
       entity.concertScheduleId,
       entity.price,
       entity.number,
-      entity.status,
+      entity.isPaid,
+      entity.reservedUntil,
       entity.concertSchedule && ConcertScheduleMapper.toDomain(entity.concertSchedule),
     );
   }
@@ -23,7 +24,8 @@ export class ConcertSeatMapper {
     entity.concertScheduleId = domain.concertScheduleId;
     entity.price = domain.price;
     entity.number = domain.number;
-    entity.status = domain.status;
+    entity.isPaid = domain.isPaid;
+    entity.reservedUntil = domain.reservedUntil;
     entity.concertSchedule = domain.concertSchedule && ConcertScheduleMapper.toEntity(domain.concertSchedule);
 
     return entity;

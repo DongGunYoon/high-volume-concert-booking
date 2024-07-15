@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { ConcertController } from './controller/concert.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConcertEntity } from 'src/infrastructure/concert/entity/concert.entity';
 import { ConcertScheduleEntity } from 'src/infrastructure/concert/entity/concert-schedule.entity';
@@ -21,14 +20,15 @@ import { BookConcertSeatUseCaseSymbol } from 'src/domain/concert/interface/use-c
 import { BookConcertSeatUseCaseImpl } from 'src/application/concert/use-case/book-concert-seat.use-case.impl';
 import { ConcertBookingRepositorySymbol } from 'src/domain/concert/interface/repository/concert-booking.repository';
 import { ConcertBookingRepositoryImpl } from 'src/infrastructure/concert/repository/concert-booking.repository.impl';
-import { AuthModule } from 'src/domain/auth/auth.module';
 import { PayConcertBookingUseCaseSymbol } from 'src/domain/concert/interface/use-case/pay-concert-booking.use-case';
 import { PayConcertBookingUseCaseImpl } from 'src/application/concert/use-case/pay-concert-booking.use-case.impl';
 import { PaymentService } from 'src/domain/concert/service/payment.service';
 import { ConcertPaymentRepositorySymbol } from 'src/domain/concert/interface/repository/concert-payment.repository';
 import { ConcertPaymentRepositoryImpl } from 'src/infrastructure/concert/repository/concert-payment.repository.impl';
-import { PointModule } from '../point/point.module';
-import { UserModule } from '../user/user.module';
+import { AuthModule } from './auth.module';
+import { UserModule } from './user.module';
+import { PointModule } from './point.module';
+import { ConcertController } from 'src/interface/presentation/concert/controller/concert.controller';
 
 @Module({
   imports: [

@@ -1,16 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 import { ChargePointUseCaseDTO } from 'src/application/point/dto/charge-point.use-case.dto';
-import { AuthModule } from 'src/domain/auth/auth.module';
 import { PointTransactionType } from 'src/domain/point/enum/point.enum';
 import { ChargePointUseCase, ChargePointUseCaseSymbol } from 'src/domain/point/interface/use-case/charge-point.use-case';
 import { Point } from 'src/domain/point/model/point.domain';
 import { User } from 'src/domain/user/model/user.domain';
-import { getPgTestTypeOrmModule } from 'src/infrastructure/database/utils/get-test-typeorm.module';
+import { TestTypeORMConfig } from 'src/infrastructure/database/config/test-typeorm.config';
 import { PointHistoryEntity } from 'src/infrastructure/point/entity/point-history.entity';
 import { UserEntity } from 'src/infrastructure/user/entity/user.entity';
 import { UserMapper } from 'src/infrastructure/user/mapper/user.mapper';
-import { PointModule } from 'src/presentation/point/point.module';
+import { AuthModule } from 'src/module/auth.module';
+import { PointModule } from 'src/module/point.module';
 import { Repository } from 'typeorm';
 
 describe('ChargePointUseCase', () => {
@@ -21,7 +21,7 @@ describe('ChargePointUseCase', () => {
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
-      imports: [getPgTestTypeOrmModule(), PointModule, AuthModule],
+      imports: [TypeOrmModule.forRoot(TestTypeORMConfig), PointModule, AuthModule],
     }).compile();
 
     chargePointUseCase = module.get<ChargePointUseCase>(ChargePointUseCaseSymbol);

@@ -5,11 +5,11 @@ import { ConcertBookingResponse } from '../dto/response/concert-booking.response
 import { ConcertPaymentResponse } from '../dto/response/concert-payment.response';
 import { ScanBookableSchedulesUseCase, ScanBookableSchedulesUseCaseSymbol } from 'src/domain/concert/interface/use-case/scan-bookable-schedules.use-case';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { UserQueueAuthGuard } from 'src/domain/auth/guard/auth.guard';
+import { UserQueueAuthGuard } from 'src/common/guard/auth.guard';
 import { ScanConcertSeatsUseCase, ScanConcertSeatsUseCaseSymbol } from 'src/domain/concert/interface/use-case/scan-concert-seats.use-case';
 import { BookConcertSeatUseCase, BookConcertSeatUseCaseSymbol } from 'src/domain/concert/interface/use-case/book-concert-seat.use-case';
-import { TokenPayload } from 'src/domain/auth/decorator/auth.decorator';
-import { UserQueueTokenPayload } from 'src/domain/auth/interface/auth.interface';
+import { TokenPayload } from 'src/common/decorator/auth.decorator';
+import { UserQueueTokenPayload } from 'src/common/interface/auth.interface';
 import { BookConcertSeatRequest } from '../dto/request/book-concert-seat.request';
 import { PayConcertBookingUseCase, PayConcertBookingUseCaseSymbol } from 'src/domain/concert/interface/use-case/pay-concert-booking.use-case';
 import { PayConcertBookingRequest } from '../dto/request/pay-concert-booking.request';

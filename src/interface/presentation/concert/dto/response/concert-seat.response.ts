@@ -1,4 +1,3 @@
-import { ConcertSeatStatus } from 'src/domain/concert/enum/concert.enum';
 import { ConcertSeat } from 'src/domain/concert/model/concert-seat.domain';
 
 export class ConcertSeatResponse {
@@ -7,10 +6,10 @@ export class ConcertSeatResponse {
     public concertScheduleId: number,
     public price: number,
     public number: number,
-    public status: ConcertSeatStatus,
+    public isAvailable: boolean,
   ) {}
 
   static from(concertSeat: ConcertSeat): ConcertSeatResponse {
-    return new ConcertSeatResponse(concertSeat.id, concertSeat.concertScheduleId, concertSeat.price, concertSeat.number, concertSeat.status);
+    return new ConcertSeatResponse(concertSeat.id, concertSeat.concertScheduleId, concertSeat.price, concertSeat.number, concertSeat.isAvailable());
   }
 }

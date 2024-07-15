@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { AppModule } from './module/app.module';
 import { SwaggerModule } from '@nestjs/swagger';
 import { readFileSync } from 'fs';
 import * as path from 'path';
@@ -15,4 +15,5 @@ async function bootstrap() {
 
   await app.listen(3000);
 }
+
 bootstrap();

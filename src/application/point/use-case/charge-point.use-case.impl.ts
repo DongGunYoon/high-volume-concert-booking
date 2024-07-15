@@ -3,7 +3,7 @@ import { Point } from 'src/domain/point/model/point.domain';
 import { PointService } from 'src/domain/point/service/point.service';
 import { DataSource } from 'typeorm';
 import { ChargePointUseCaseDTO } from '../dto/charge-point.use-case.dto';
-import { PessimisticLockMode } from 'src/domain/database/enum/lock-mode.enum';
+import { PessimisticLockMode } from 'src/common/enum/database.enum';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()

@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { AuthModule } from 'src/domain/auth/auth.module';
+import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 import { ScanBookableSchedulesUseCase, ScanBookableSchedulesUseCaseSymbol } from 'src/domain/concert/interface/use-case/scan-bookable-schedules.use-case';
 import { ConcertSchedule } from 'src/domain/concert/model/concert-schedule.domain';
 import { Concert } from 'src/domain/concert/model/concert.domain';
@@ -8,8 +7,9 @@ import { ConcertScheduleEntity } from 'src/infrastructure/concert/entity/concert
 import { ConcertEntity } from 'src/infrastructure/concert/entity/concert.entity';
 import { ConcertScheduleMapper } from 'src/infrastructure/concert/mapper/concert-schedule.mapper';
 import { ConcertMapper } from 'src/infrastructure/concert/mapper/concert.mapper';
-import { getPgTestTypeOrmModule } from 'src/infrastructure/database/utils/get-test-typeorm.module';
-import { ConcertModule } from 'src/presentation/concert/concert.module';
+import { TestTypeORMConfig } from 'src/infrastructure/database/config/test-typeorm.config';
+import { AuthModule } from 'src/module/auth.module';
+import { ConcertModule } from 'src/module/concert.module';
 import { Repository } from 'typeorm';
 
 describe('ScanBookableSchedulesUseCase', () => {
@@ -20,7 +20,7 @@ describe('ScanBookableSchedulesUseCase', () => {
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
-      imports: [getPgTestTypeOrmModule(), ConcertModule, AuthModule],
+      imports: [TypeOrmModule.forRoot(TestTypeORMConfig), ConcertModule, AuthModule],
     }).compile();
 
     scanBookableSchedulesUseCase = module.get<ScanBookableSchedulesUseCase>(ScanBookableSchedulesUseCaseSymbol);

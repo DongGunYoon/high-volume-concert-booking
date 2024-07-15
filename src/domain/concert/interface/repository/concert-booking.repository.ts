@@ -1,6 +1,6 @@
 import { EntityManager } from 'typeorm';
 import { ConcertBooking } from '../../model/concert-booking.domain';
-import { CustomLock } from 'src/domain/database/interface/lock.interface';
+import { CustomLock } from 'src/common/interface/database.interface';
 import { Nullable } from 'src/common/type/native';
 
 export const ConcertBookingRepositorySymbol = Symbol.for('ConcertBookingRepository');

@@ -4,7 +4,7 @@ import { ConcertScheduleRepository, ConcertScheduleRepositorySymbol } from '../i
 import { ConcertRepository, ConcertRepositorySymbol } from '../interface/repository/concert.repository';
 import { ConcertSeatRepository, ConcertSeatRepositorySymbol } from '../interface/repository/concert-seat.repository';
 import { ConcertSeat } from '../model/concert-seat.domain';
-import { CustomLock } from 'src/domain/database/interface/lock.interface';
+import { CustomLock } from 'src/common/interface/database.interface';
 import { EntityManager } from 'typeorm';
 import { CreateConcertBookingDTO } from '../dto/create-concert-booking.dto';
 import { ConcertBooking } from '../model/concert-booking.domain';
