@@ -29,6 +29,8 @@ import { AuthModule } from './auth.module';
 import { UserModule } from './user.module';
 import { PointModule } from './point.module';
 import { ConcertController } from 'src/interface/presentation/concert/controller/concert.controller';
+import { ScanConcertsUseCaseImpl } from 'src/application/concert/use-case/scan-concerts.use-case.impl';
+import { ScanConcertsUseCaseSymbol } from 'src/domain/concert/interface/use-case/scan-concerts.use-case';
 
 @Module({
   imports: [
@@ -41,6 +43,7 @@ import { ConcertController } from 'src/interface/presentation/concert/controller
   providers: [
     ConcertService,
     PaymentService,
+    { provide: ScanConcertsUseCaseSymbol, useClass: ScanConcertsUseCaseImpl },
     { provide: ScanBookableSchedulesUseCaseSymbol, useClass: ScanBookableSchedulesUseCaseImpl },
     { provide: ScanConcertSeatsUseCaseSymbol, useClass: ScanConcertSeatsUseCaseImpl },
     { provide: BookConcertSeatUseCaseSymbol, useClass: BookConcertSeatUseCaseImpl },

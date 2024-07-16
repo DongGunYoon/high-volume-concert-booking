@@ -10,6 +10,7 @@ import { CreateConcertBookingDTO } from '../dto/create-concert-booking.dto';
 import { ConcertBooking } from '../model/concert-booking.domain';
 import { ConcertBookingRepository, ConcertBookingRepositorySymbol } from '../interface/repository/concert-booking.repository';
 import { PayConcertBookingDTO } from '../dto/pay-concert-booking.dto';
+import { Concert } from '../model/concert.domain';
 
 @Injectable()
 export class ConcertService {
@@ -19,6 +20,10 @@ export class ConcertService {
     @Inject(ConcertSeatRepositorySymbol) private readonly concertSeatRepository: ConcertSeatRepository,
     @Inject(ConcertBookingRepositorySymbol) private readonly concertBookingRepository: ConcertBookingRepository,
   ) {}
+
+  async scanConcerts(): Promise<Concert[]> {
+    return await this.concertRepository.findAll();
+  }
 
   async scanBookableSchedueles(concertId: number): Promise<ConcertSchedule[]> {
     const concertExists = await this.concertRepository.existsById(concertId);

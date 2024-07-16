@@ -13,16 +13,33 @@ import { UserQueueTokenPayload } from 'src/common/interface/auth.interface';
 import { BookConcertSeatRequest } from '../dto/request/book-concert-seat.request';
 import { PayConcertBookingUseCase, PayConcertBookingUseCaseSymbol } from 'src/domain/concert/interface/use-case/pay-concert-booking.use-case';
 import { PayConcertBookingRequest } from '../dto/request/pay-concert-booking.request';
+import { ConcertResponse } from '../dto/response/concert.response';
+import { ScanConcertsUseCase, ScanConcertsUseCaseSymbol } from 'src/domain/concert/interface/use-case/scan-concerts.use-case';
 
 @ApiTags('콘서트 관련 API')
 @Controller('concerts')
 export class ConcertController {
   constructor(
+    @Inject(ScanConcertsUseCaseSymbol) private readonly scanConcertsUseCase: ScanConcertsUseCase,
     @Inject(ScanBookableSchedulesUseCaseSymbol) private readonly scanBookableScheduelsUseCase: ScanBookableSchedulesUseCase,
     @Inject(ScanConcertSeatsUseCaseSymbol) private readonly scanConcertSeatsUseCase: ScanConcertSeatsUseCase,
     @Inject(BookConcertSeatUseCaseSymbol) private readonly bookConcertSeatUseCase: BookConcertSeatUseCase,
     @Inject(PayConcertBookingUseCaseSymbol) private readonly payConcertBookingUseCase: PayConcertBookingUseCase,
   ) {}
+
+  /**
+   * 콘서트 목록을 조회합니다.
+   * @summary 콘서트 목록 조회
+   * @returns
+   */
+  @ApiBearerAuth()
+  @UseGuards(UserQueueAuthGuard)
+  @Get()
+  async scanConcerts(): Promise<ConcertResponse[]> {
+    const concerts = await this.scanConcertsUseCase.execute();
+
+    return concerts.map(concert => ConcertResponse.from(concert));
+  }
 
   /**
    * 예약 가능한 콘서트 스케쥴 목록을 조회합니다.

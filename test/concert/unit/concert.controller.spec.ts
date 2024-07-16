@@ -6,6 +6,7 @@ import { BookConcertSeatUseCase, BookConcertSeatUseCaseSymbol } from 'src/domain
 import { PayConcertBookingUseCase, PayConcertBookingUseCaseSymbol } from 'src/domain/concert/interface/use-case/pay-concert-booking.use-case';
 import { ScanBookableSchedulesUseCase, ScanBookableSchedulesUseCaseSymbol } from 'src/domain/concert/interface/use-case/scan-bookable-schedules.use-case';
 import { ScanConcertSeatsUseCase, ScanConcertSeatsUseCaseSymbol } from 'src/domain/concert/interface/use-case/scan-concert-seats.use-case';
+import { ScanConcertsUseCaseSymbol } from 'src/domain/concert/interface/use-case/scan-concerts.use-case';
 import { ConcertBooking } from 'src/domain/concert/model/concert-booking.domain';
 import { ConcertPayment } from 'src/domain/concert/model/concert-payment.domain';
 import { ConcertSchedule } from 'src/domain/concert/model/concert-schedule.domain';
@@ -31,6 +32,7 @@ describe('ConcertController', () => {
     const module = await Test.createTestingModule({
       controllers: [ConcertController],
       providers: [
+        { provide: ScanConcertsUseCaseSymbol, useValue: { execute: jest.fn() } },
         { provide: ScanBookableSchedulesUseCaseSymbol, useValue: { execute: jest.fn() } },
         { provide: ScanConcertSeatsUseCaseSymbol, useValue: { execute: jest.fn() } },
         { provide: BookConcertSeatUseCaseSymbol, useValue: { execute: jest.fn() } },
