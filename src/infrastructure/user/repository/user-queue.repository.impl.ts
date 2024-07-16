@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserQueueRepository } from 'src/domain/user/interface/repository/user-queue.repository';
 import { UserQueueEntity } from '../entity/user-queue.entity';
-import { IsNull, MoreThan, Repository } from 'typeorm';
+import { IsNull, MoreThan, Repository, Or } from 'typeorm';
 import { Nullable } from 'src/common/type/native';
 import { UserQueue } from 'src/domain/user/model/user-queue.domain';
 import { UserQueueMapper } from '../mapper/user-queue.mapper';
@@ -24,7 +24,7 @@ export class UserQueueRepositoryImpl implements UserQueueRepository {
   }
 
   async findUnexpiredByUserId(userId: number): Promise<Nullable<UserQueue>> {
-    const entity = await this.userQueueRepository.findOne({ where: { userId, expiresAt: MoreThan(new Date()) } });
+    const entity = await this.userQueueRepository.findOne({ where: { userId, expiresAt: Or(MoreThan(new Date()), IsNull()) } });
 
     return entity && UserQueueMapper.toDomain(entity);
   }
