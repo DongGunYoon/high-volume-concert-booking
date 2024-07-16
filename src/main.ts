@@ -5,10 +5,12 @@ import { readFileSync } from 'fs';
 import * as path from 'path';
 import { ValidationPipe } from '@nestjs/common';
 import { ApiResponseInterceptor } from './common/interceptor/api.interceptor';
+import { ApiExceptionFilter } from './common/filter/api-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.useGlobalFilters(new ApiExceptionFilter());
   app.useGlobalInterceptors(new ApiResponseInterceptor());
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
