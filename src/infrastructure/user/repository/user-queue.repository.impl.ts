@@ -29,6 +29,12 @@ export class UserQueueRepositoryImpl implements UserQueueRepository {
     return entity && UserQueueMapper.toDomain(entity);
   }
 
+  async findOneById(id: number): Promise<Nullable<UserQueue>> {
+    const entity = await this.userQueueRepository.findOne({ where: { id } });
+
+    return entity && UserQueueMapper.toDomain(entity);
+  }
+
   async expireById(id: number): Promise<void> {
     await this.userQueueRepository.update({ id }, { expiresAt: new Date() });
   }

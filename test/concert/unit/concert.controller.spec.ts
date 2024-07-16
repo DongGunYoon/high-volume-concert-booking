@@ -11,6 +11,7 @@ import { ConcertPayment } from 'src/domain/concert/model/concert-payment.domain'
 import { ConcertSchedule } from 'src/domain/concert/model/concert-schedule.domain';
 import { ConcertSeat } from 'src/domain/concert/model/concert-seat.domain';
 import { Concert } from 'src/domain/concert/model/concert.domain';
+import { UserQueueService } from 'src/domain/user/service/user-queue.service';
 import { ConcertController } from 'src/interface/presentation/concert/controller/concert.controller';
 import { BookConcertSeatRequest } from 'src/interface/presentation/concert/dto/request/book-concert-seat.request';
 import { PayConcertBookingRequest } from 'src/interface/presentation/concert/dto/request/pay-concert-booking.request';
@@ -35,6 +36,7 @@ describe('ConcertController', () => {
         { provide: BookConcertSeatUseCaseSymbol, useValue: { execute: jest.fn() } },
         { provide: PayConcertBookingUseCaseSymbol, useValue: { execute: jest.fn() } },
         { provide: JwtService, useValue: { sign: jest.fn(), verify: jest.fn() } },
+        { provide: UserQueueService, useValue: { getByIdOrThrow: jest.fn() } },
         {
           provide: UserQueueAuthGuard,
           useValue: { canActivate: jest.fn().mockReturnValue(true) },
