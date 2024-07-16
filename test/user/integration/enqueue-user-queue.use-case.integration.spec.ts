@@ -3,7 +3,7 @@ import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 import { EnqueueUserQueueUseCase, EnqueueUserQueueUseCaseSymbol } from 'src/domain/user/interface/use-case/enqueue-user-queue.use-case';
 import { UserQueue } from 'src/domain/user/model/user-queue.domain';
 import { User } from 'src/domain/user/model/user.domain';
-import { TestTypeORMConfig } from 'src/infrastructure/database/config/test-typeorm.config';
+import { TestTypeORMConfig } from 'test/common/test-typeorm.config';
 import { UserQueueEntity } from 'src/infrastructure/user/entity/user-queue.entity';
 import { UserEntity } from 'src/infrastructure/user/entity/user.entity';
 import { UserQueueMapper } from 'src/infrastructure/user/mapper/user-queue.mapper';

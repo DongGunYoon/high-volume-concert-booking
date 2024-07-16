@@ -8,7 +8,7 @@ export const TestTypeORMConfig: TypeOrmModuleOptions = {
   username: 'root',
   password: 'password',
   database: 'high-volume-concert-booking-test',
-  entities: [path.join(__dirname, '..', '..', '**', '*.entity{.ts,.js}')],
+  entities: [path.join(__dirname, '..', '..', 'src', '**', '*.entity.ts')],
   synchronize: true,
   logging: false,
 };

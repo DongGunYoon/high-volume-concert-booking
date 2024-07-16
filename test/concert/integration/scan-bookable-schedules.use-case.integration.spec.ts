@@ -7,7 +7,7 @@ import { ConcertScheduleEntity } from 'src/infrastructure/concert/entity/concert
 import { ConcertEntity } from 'src/infrastructure/concert/entity/concert.entity';
 import { ConcertScheduleMapper } from 'src/infrastructure/concert/mapper/concert-schedule.mapper';
 import { ConcertMapper } from 'src/infrastructure/concert/mapper/concert.mapper';
-import { TestTypeORMConfig } from 'src/infrastructure/database/config/test-typeorm.config';
+import { TestTypeORMConfig } from 'test/common/test-typeorm.config';
 import { AuthModule } from 'src/module/auth.module';
 import { ConcertModule } from 'src/module/concert.module';
 import { Repository } from 'typeorm';

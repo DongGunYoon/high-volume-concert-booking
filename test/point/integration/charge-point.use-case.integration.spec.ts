@@ -5,7 +5,7 @@ import { PointTransactionType } from 'src/domain/point/enum/point.enum';
 import { ChargePointUseCase, ChargePointUseCaseSymbol } from 'src/domain/point/interface/use-case/charge-point.use-case';
 import { Point } from 'src/domain/point/model/point.domain';
 import { User } from 'src/domain/user/model/user.domain';
-import { TestTypeORMConfig } from 'src/infrastructure/database/config/test-typeorm.config';
+import { TestTypeORMConfig } from 'test/common/test-typeorm.config';
 import { PointHistoryEntity } from 'src/infrastructure/point/entity/point-history.entity';
 import { UserEntity } from 'src/infrastructure/user/entity/user.entity';
 import { UserMapper } from 'src/infrastructure/user/mapper/user.mapper';

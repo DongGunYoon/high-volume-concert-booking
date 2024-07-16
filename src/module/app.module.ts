@@ -6,7 +6,7 @@ import { ConcertModule } from './concert.module';
 import { PointModule } from './point.module';
 import { UserModule } from './user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TypeORMConfig } from 'src/infrastructure/database/config/typeorm.config';
+import { TypeORMConfig } from 'src/config/typeorm.config';
 
 @Module({
   imports: [

@@ -3,7 +3,7 @@ import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 import { ReadPointUseCase, ReadPointUseCaseSymbol } from 'src/domain/point/interface/use-case/read-point.use-case';
 import { Point } from 'src/domain/point/model/point.domain';
 import { User } from 'src/domain/user/model/user.domain';
-import { TestTypeORMConfig } from 'src/infrastructure/database/config/test-typeorm.config';
+import { TestTypeORMConfig } from 'test/common/test-typeorm.config';
 import { PointEntity } from 'src/infrastructure/point/entity/point.entity';
 import { UserEntity } from 'src/infrastructure/user/entity/user.entity';
 import { UserMapper } from 'src/infrastructure/user/mapper/user.mapper';

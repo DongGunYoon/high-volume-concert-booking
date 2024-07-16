@@ -14,7 +14,7 @@ import { ConcertEntity } from 'src/infrastructure/concert/entity/concert.entity'
 import { ConcertScheduleMapper } from 'src/infrastructure/concert/mapper/concert-schedule.mapper';
 import { ConcertSeatMapper } from 'src/infrastructure/concert/mapper/concert-seat.mapper';
 import { ConcertMapper } from 'src/infrastructure/concert/mapper/concert.mapper';
-import { TestTypeORMConfig } from 'src/infrastructure/database/config/test-typeorm.config';
+import { TestTypeORMConfig } from 'test/common/test-typeorm.config';
 import { UserEntity } from 'src/infrastructure/user/entity/user.entity';
 import { UserMapper } from 'src/infrastructure/user/mapper/user.mapper';
 import { AuthModule } from 'src/module/auth.module';
