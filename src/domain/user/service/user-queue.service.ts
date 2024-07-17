@@ -1,6 +1,8 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { UserQueueRepository, UserQueueRepositorySymbol } from '../interface/repository/user-queue.repository';
 import { UserQueue } from '../model/user-queue.domain';
+import { CustomException } from 'src/common/exception/custom.exception';
+import { ErrorCode } from 'src/common/enum/error-code.enum';
 
 @Injectable()
 export class UserQueueService {
@@ -18,7 +20,7 @@ export class UserQueueService {
     const userQueue = await this.userQueueRepository.findOneById(id);
 
     if (!userQueue) {
-      throw new NotFoundException('유저 대기열이 존재하지 않습니다.');
+      throw new CustomException(ErrorCode.QUEUE_NOT_FOUND);
     }
 
     return userQueue;

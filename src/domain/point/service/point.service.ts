@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { PointRepository, PointRepositorySymbol } from '../interface/repository/point.repository';
 import { PointHistoryRepository, PointHistoryRepositorySymbol } from '../interface/repository/point-history.repository';
 import { EntityManager } from 'typeorm';
@@ -8,6 +8,8 @@ import { CreatePointHistoryDTO } from '../dto/create-point-history.dto';
 import { PointHistory } from '../model/point-history.domain';
 import { CustomLock } from 'src/common/interface/database.interface';
 import { PointTransactionType } from '../enum/point.enum';
+import { CustomException } from 'src/common/exception/custom.exception';
+import { ErrorCode } from 'src/common/enum/error-code.enum';
 
 @Injectable()
 export class PointService {
@@ -70,7 +72,7 @@ export class PointService {
     const point = await this.pointRepository.findOneByUserId(userId, entityManager, lock);
 
     if (!point) {
-      throw new NotFoundException('유저의 포인트가 존재하지 않습니다.');
+      throw new CustomException(ErrorCode.POINT_NOT_FOUND);
     }
 
     return point;
