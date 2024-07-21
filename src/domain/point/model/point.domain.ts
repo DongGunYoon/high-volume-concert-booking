@@ -1,4 +1,5 @@
-import { BadRequestException } from '@nestjs/common';
+import { ErrorCode } from 'src/common/enum/error-code.enum';
+import { CustomException } from 'src/common/exception/custom.exception';
 import { User } from 'src/domain/user/model/user.domain';
 
 export class Point {
@@ -15,7 +16,7 @@ export class Point {
 
   charge(amount: number): void {
     if (amount <= 0) {
-      throw new BadRequestException('충전 금액은 최소 0원 이상이어야 합니다.');
+      throw new CustomException(ErrorCode.MINIMUM_CHARGE_AMOUNT);
     }
 
     this.amount += amount;
@@ -23,11 +24,11 @@ export class Point {
 
   pay(amount: number): void {
     if (amount <= 0) {
-      throw new BadRequestException('결제 금액은 최소 0원 이상이어야 합니다.');
+      throw new CustomException(ErrorCode.MINIMUM_PAYMENT_AMOUNT);
     }
 
     if (this.amount < amount) {
-      throw new BadRequestException('결제에 필요한 금액이 모자릅니다.');
+      throw new CustomException(ErrorCode.INSUFFICIENT_POINT);
     }
 
     this.amount -= amount;

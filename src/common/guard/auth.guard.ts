@@ -1,7 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { UserQueueService } from 'src/domain/user/service/user-queue.service';
+import { CustomException } from '../exception/custom.exception';
+import { ErrorCode } from '../enum/error-code.enum';
 
 @Injectable()
 export class UserAuthGuard implements CanActivate {
@@ -12,7 +14,7 @@ export class UserAuthGuard implements CanActivate {
     const token = extractTokenFromHeader(request);
 
     if (!token) {
-      throw new UnauthorizedException();
+      throw new CustomException(ErrorCode.TOKEN_NOT_PROVIDED);
     }
 
     try {
@@ -22,7 +24,7 @@ export class UserAuthGuard implements CanActivate {
 
       request['user'] = payload;
     } catch {
-      throw new UnauthorizedException();
+      throw new CustomException(ErrorCode.INVALID_TOKEN);
     }
 
     return true;
@@ -41,7 +43,7 @@ export class UserQueueAuthGuard implements CanActivate {
     const token = extractTokenFromHeader(request);
 
     if (!token) {
-      throw new UnauthorizedException();
+      throw new CustomException(ErrorCode.TOKEN_NOT_PROVIDED);
     }
 
     try {
@@ -52,12 +54,12 @@ export class UserQueueAuthGuard implements CanActivate {
       const userQueue = await this.userQueueService.getByIdOrThrow(payload.userQueueId);
 
       if (userQueue.expiresAt! < new Date()) {
-        throw new UnauthorizedException('이미 만료된 토큰입니다.');
+        throw new CustomException(ErrorCode.TOKEN_EXPIRED);
       }
 
       request['user'] = payload;
     } catch {
-      throw new UnauthorizedException();
+      throw new CustomException(ErrorCode.INVALID_TOKEN);
     }
     return true;
   }

@@ -7,6 +7,7 @@ import { PointModule } from './point.module';
 import { UserModule } from './user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeORMConfig } from 'src/config/typeorm.config';
+import { LoggerModule } from './logger.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { TypeORMConfig } from 'src/config/typeorm.config';
     PointModule,
     UserModule,
     AuthModule,
+    LoggerModule,
   ],
   controllers: [],
   providers: [],

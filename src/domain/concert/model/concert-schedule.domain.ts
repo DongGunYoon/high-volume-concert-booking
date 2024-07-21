@@ -1,5 +1,6 @@
-import { BadRequestException } from '@nestjs/common';
 import { Concert } from './concert.domain';
+import { CustomException } from 'src/common/exception/custom.exception';
+import { ErrorCode } from 'src/common/enum/error-code.enum';
 
 export class ConcertSchedule {
   constructor(
@@ -14,11 +15,11 @@ export class ConcertSchedule {
 
   validateBookable(): void {
     if (this.bookingStartAt > new Date()) {
-      throw new BadRequestException('아직 예약 신청 가능 일자가 아닙니다.');
+      throw new CustomException(ErrorCode.BOOKING_NOT_STARTED);
     }
 
     if (this.bookingEndAt < new Date()) {
-      throw new BadRequestException('이미 예약 신청 가능 일자가 지났습니다.');
+      throw new CustomException(ErrorCode.BOOKING_ALREADY_PASSED);
     }
   }
 }

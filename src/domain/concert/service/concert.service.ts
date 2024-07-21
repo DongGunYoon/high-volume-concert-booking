@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConcertSchedule } from '../model/concert-schedule.domain';
 import { ConcertScheduleRepository, ConcertScheduleRepositorySymbol } from '../interface/repository/concert-schedule.repository';
 import { ConcertRepository, ConcertRepositorySymbol } from '../interface/repository/concert.repository';
@@ -11,6 +11,8 @@ import { ConcertBooking } from '../model/concert-booking.domain';
 import { ConcertBookingRepository, ConcertBookingRepositorySymbol } from '../interface/repository/concert-booking.repository';
 import { PayConcertBookingDTO } from '../dto/pay-concert-booking.dto';
 import { Concert } from '../model/concert.domain';
+import { CustomException } from 'src/common/exception/custom.exception';
+import { ErrorCode } from 'src/common/enum/error-code.enum';
 
 @Injectable()
 export class ConcertService {
@@ -29,7 +31,7 @@ export class ConcertService {
     const concertExists = await this.concertRepository.existsById(concertId);
 
     if (!concertExists) {
-      throw new NotFoundException(`콘서트가 존재하지 않습니다.`);
+      throw new CustomException(ErrorCode.CONCERT_NOT_FOUND);
     }
 
     return await this.concertScheduleRepository.findAllBookableByConcertId(concertId);
@@ -39,7 +41,7 @@ export class ConcertService {
     const concertScheduleExists = await this.concertScheduleRepository.existsById(concertScheduleId);
 
     if (!concertScheduleExists) {
-      throw new NotFoundException('콘서트 스케쥴이 존재하지 않습니다.');
+      throw new CustomException(ErrorCode.SCHEDULE_NOT_FOUND);
     }
 
     return await this.concertSeatRepository.findAllByConcertScheduleId(concertScheduleId);
@@ -49,7 +51,7 @@ export class ConcertService {
     const concertSeat = await this.concertSeatRepository.findOneById(concertSeatId, entityManager, lock);
 
     if (!concertSeat) {
-      throw new NotFoundException('콘서트 좌석이 존재하지 않습니다.');
+      throw new CustomException(ErrorCode.SEAT_NOT_FOUND);
     }
 
     concertSeat.book();
@@ -67,7 +69,7 @@ export class ConcertService {
     const concertSeat = await this.concertSeatRepository.findOneById(seatId, entityManager, lock);
 
     if (!concertSeat) {
-      throw new NotFoundException('콘서트 좌석이 존재하지 않습니다.');
+      throw new CustomException(ErrorCode.SEAT_NOT_FOUND);
     }
 
     concertSeat.pay();
@@ -79,7 +81,7 @@ export class ConcertService {
     const concertBooking = await this.concertBookingRepository.findOneById(dto.concertBookingId, entityManager, lock);
 
     if (!concertBooking) {
-      throw new NotFoundException('콘서트 예약이 존재하지 않습니다.');
+      throw new CustomException(ErrorCode.BOOKING_NOT_FOUND);
     }
 
     concertBooking.pay(dto.userId);
@@ -91,7 +93,7 @@ export class ConcertService {
     const concertSchedule = await this.concertScheduleRepository.findOneById(concertScheduleId);
 
     if (!concertSchedule) {
-      throw new NotFoundException('콘서트 스케쥴이 존재하지 않습니다.');
+      throw new CustomException(ErrorCode.SCHEDULE_NOT_FOUND);
     }
 
     concertSchedule.validateBookable();

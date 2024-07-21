@@ -1,5 +1,6 @@
-import { BadRequestException } from '@nestjs/common';
 import { CreateConcertBookingDTO } from '../dto/create-concert-booking.dto';
+import { CustomException } from 'src/common/exception/custom.exception';
+import { ErrorCode } from 'src/common/enum/error-code.enum';
 
 export class ConcertBooking {
   constructor(
@@ -29,15 +30,15 @@ export class ConcertBooking {
 
   pay(userId: number): void {
     if (this.userId !== userId) {
-      throw new BadRequestException('내가 예약한 콘서트만 결제 가능합니다.');
+      throw new CustomException(ErrorCode.UNAUTHORIZED_CONCERT_PAYMENT);
     }
 
     if (this.isPaid) {
-      throw new BadRequestException('이미 결제가 처리되었습니다.');
+      throw new CustomException(ErrorCode.PAYMENT_ALREADY_PROCESSED);
     }
 
     if (this.expiresAt < new Date()) {
-      throw new BadRequestException('결제 만료 시간이 초과되었습니다.');
+      throw new CustomException(ErrorCode.PAYMENT_EXPIRED);
     }
 
     this.isPaid = true;

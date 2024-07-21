@@ -1,6 +1,7 @@
-import { BadRequestException } from '@nestjs/common';
 import { CreatePointHistoryDTO } from '../dto/create-point-history.dto';
 import { PointTransactionType } from '../enum/point.enum';
+import { CustomException } from 'src/common/exception/custom.exception';
+import { ErrorCode } from 'src/common/enum/error-code.enum';
 
 export class PointHistory {
   constructor(
@@ -14,7 +15,7 @@ export class PointHistory {
 
   static create(dto: CreatePointHistoryDTO): PointHistory {
     if (dto.amount <= 0) {
-      throw new BadRequestException('충전 금액은 최소 0원 이상이어야 합니다.');
+      throw new CustomException(ErrorCode.MINIMUM_CHARGE_AMOUNT);
     }
 
     return new PointHistory(0, dto.userId, dto.pointId, dto.amount, dto.transactionType, new Date());

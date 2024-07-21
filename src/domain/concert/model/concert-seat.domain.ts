@@ -1,6 +1,7 @@
-import { BadRequestException, ConflictException } from '@nestjs/common';
 import { ConcertSchedule } from './concert-schedule.domain';
 import { Nullable } from 'src/common/type/native';
+import { CustomException } from 'src/common/exception/custom.exception';
+import { ErrorCode } from 'src/common/enum/error-code.enum';
 
 export class ConcertSeat {
   constructor(
@@ -16,11 +17,11 @@ export class ConcertSeat {
 
   book(): void {
     if (this.reservedUntil && this.reservedUntil > new Date()) {
-      throw new ConflictException('선택한 콘서트 좌석은 이미 예약되었습니다.');
+      throw new CustomException(ErrorCode.SEAT_ALREADY_BOOKED);
     }
 
     if (this.isPaid) {
-      throw new ConflictException('선택한 콘서트 좌석은 이미 판매되었습니다.');
+      throw new CustomException(ErrorCode.SEAT_ALREADY_SOLD);
     }
 
     this.reservedUntil = new Date(Date.now() + 5 * 60 * 1000);
@@ -28,11 +29,11 @@ export class ConcertSeat {
 
   pay(): void {
     if (this.isPaid) {
-      throw new ConflictException('선택한 콘서트 좌석은 이미 판매되었습니다.');
+      throw new CustomException(ErrorCode.SEAT_ALREADY_SOLD);
     }
 
     if (this.reservedUntil == null || this.reservedUntil < new Date()) {
-      throw new BadRequestException('좌석이 예약된 상태가 아닙니다.');
+      throw new CustomException(ErrorCode.SEAT_NOT_RESERVED);
     }
 
     this.isPaid = true;
