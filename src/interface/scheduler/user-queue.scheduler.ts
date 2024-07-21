@@ -1,14 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { ActivateUserQueuesUseCase, ActivateUserQueuesUseCaseSymbol } from './../../domain/user/interface/use-case/activae-user-queues.use-case';
+import { Inject, Injectable } from '@nestjs/common';
 import { CronExpression } from '@nestjs/schedule';
-import { UserQueueService } from 'src/domain/user/service/user-queue.service';
 import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class UserQueueScheduler {
-  constructor(private readonly userQueueService: UserQueueService) {}
+  constructor(@Inject(ActivateUserQueuesUseCaseSymbol) private readonly activateUserQueuesUseCase: ActivateUserQueuesUseCase) {}
 
   @Cron(CronExpression.EVERY_10_SECONDS)
   async processQueue(): Promise<void> {
-    await this.userQueueService.activateQueues();
+    await this.activateUserQueuesUseCase.execute();
   }
 }

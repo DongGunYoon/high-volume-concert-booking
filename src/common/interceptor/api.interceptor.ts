@@ -1,8 +1,9 @@
-import { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { map, tap } from 'rxjs';
 import { ApiResponse } from '../dto/api.response';
 import { LoggerService } from '../logger/logger.service';
 
+@Injectable()
 export class ApiResponseInterceptor implements NestInterceptor {
   constructor(private readonly logger: LoggerService) {}
 

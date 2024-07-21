@@ -3,16 +3,17 @@ import { UserQueueRepository, UserQueueRepositorySymbol } from '../interface/rep
 import { UserQueue } from '../model/user-queue.domain';
 import { CustomException } from 'src/common/exception/custom.exception';
 import { ErrorCode } from 'src/common/enum/error-code.enum';
+import { Nullable } from 'src/common/type/native';
 
 @Injectable()
 export class UserQueueService {
   constructor(@Inject(UserQueueRepositorySymbol) private readonly userQueueRepository: UserQueueRepository) {}
 
-  async upsert(userId: number): Promise<UserQueue> {
-    const unexpiredQueue = await this.userQueueRepository.findUnexpiredByUserId(userId);
+  async getUnexpired(userId: number): Promise<Nullable<UserQueue>> {
+    return this.userQueueRepository.findUnexpiredByUserId(userId);
+  }
 
-    if (unexpiredQueue) return unexpiredQueue;
-
+  async create(userId: number): Promise<UserQueue> {
     return await this.userQueueRepository.save(UserQueue.create(userId));
   }
 
@@ -27,9 +28,11 @@ export class UserQueueService {
   }
 
   async calculateOrder(userQueue: UserQueue): Promise<void> {
+    if (userQueue.isActive()) return;
+
     const oldestPendingQueue = await this.userQueueRepository.findOldestPending();
 
-    userQueue.setCurrentOrder(oldestPendingQueue && oldestPendingQueue.id);
+    userQueue.calculateCurrentOrder(oldestPendingQueue && oldestPendingQueue.id);
   }
 
   async activateQueues(): Promise<void> {

@@ -8,9 +8,11 @@ export class EnqueueUserQueueUseCaseImpl implements EnqueueUserQueueUseCase {
   constructor(private readonly userQueueService: UserQueueService) {}
 
   async execute(userId: number): Promise<UserQueue> {
-    const userQueue = await this.userQueueService.upsert(userId);
+    let userQueue = await this.userQueueService.getUnexpired(userId);
 
-    if (userQueue.token) return userQueue;
+    if (!userQueue) {
+      userQueue = await this.userQueueService.create(userId);
+    }
 
     await this.userQueueService.calculateOrder(userQueue);
 

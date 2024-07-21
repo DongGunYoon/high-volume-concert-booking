@@ -1,4 +1,4 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { plainToInstance } from 'class-transformer';
 import * as request from 'supertest';
@@ -17,7 +17,6 @@ describe('UserController (e2e)', () => {
     }).compile();
 
     app = module.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ transform: true }));
     await app.init();
 
     testDataService = module.get<TestDataService>(TestDataService);

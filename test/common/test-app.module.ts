@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -17,9 +17,10 @@ import { ConcertScheduleEntity } from 'src/infrastructure/concert/entity/concert
 import { ConcertSeatEntity } from 'src/infrastructure/concert/entity/concert-seat.entity';
 import { ConcertBookingEntity } from 'src/infrastructure/concert/entity/concert-booking.entity';
 import { ConcertPaymentEntity } from 'src/infrastructure/concert/entity/concert-payment.entity';
-import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ApiExceptionFilter } from 'src/common/filter/api-exception.filter';
 import { ApiResponseInterceptor } from 'src/common/interceptor/api.interceptor';
+import { LoggerModule } from 'src/module/logger.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { ApiResponseInterceptor } from 'src/common/interceptor/api.interceptor';
     PointModule,
     UserModule,
     AuthModule,
+    LoggerModule,
   ],
   providers: [
     TestDataService,
@@ -51,6 +53,10 @@ import { ApiResponseInterceptor } from 'src/common/interceptor/api.interceptor';
     {
       provide: APP_INTERCEPTOR,
       useClass: ApiResponseInterceptor,
+    },
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({ transform: true }),
     },
   ],
   exports: [TestDataService],

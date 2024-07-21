@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth.module';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -8,6 +8,9 @@ import { UserModule } from './user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeORMConfig } from 'src/config/typeorm.config';
 import { LoggerModule } from './logger.module';
+import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { ApiExceptionFilter } from 'src/common/filter/api-exception.filter';
+import { ApiResponseInterceptor } from 'src/common/interceptor/api.interceptor';
 
 @Module({
   imports: [
@@ -21,6 +24,19 @@ import { LoggerModule } from './logger.module';
     LoggerModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: ApiExceptionFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ApiResponseInterceptor,
+    },
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({ transform: true }),
+    },
+  ],
 })
 export class AppModule {}

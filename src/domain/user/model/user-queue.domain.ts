@@ -14,7 +14,7 @@ export class UserQueue {
     return new UserQueue(0, userId, null, null);
   }
 
-  setCurrentOrder(oldestPendingId: Nullable<number>): void {
+  calculateCurrentOrder(oldestPendingId: Nullable<number>): void {
     if (oldestPendingId) {
       this.currentOrder = this.id - oldestPendingId + 1;
     } else {
@@ -32,5 +32,9 @@ export class UserQueue {
       { expiresIn: '10m' },
     );
     this.expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+  }
+
+  isActive(): boolean {
+    return !!(this.token && this.expiresAt && this.expiresAt > new Date());
   }
 }
