@@ -21,10 +21,13 @@ export class PayConcertBookingUseCaseImpl implements PayConcertBookingUseCase {
 
   async execute(dto: PayConcertBookingUseCaseDTO): Promise<ConcertPayment> {
     const payment = await this.dataSource.transaction(async transactionManager => {
-      const booking = await this.concertService.payBooking(dto.toPayBookingDTO(), transactionManager, { mode: PessimisticLockMode.PESSIMISTIC_WRTIE });
-      await this.concertService.paySeat(booking.concertSeatId, transactionManager, { mode: PessimisticLockMode.PESSIMISTIC_WRTIE });
-      await this.pointService.pay(dto.toPayPointDTO(booking.price), transactionManager, { mode: PessimisticLockMode.PESSIMISTIC_WRTIE });
-      return await this.paymentService.create(dto.toCreatePaymentDTO(booking.concertId, booking.concertScheduleId, booking.concertSeatId, booking.price));
+      const booking = await this.concertService.payBooking(dto.toPayBookingDTO(), transactionManager);
+      await this.concertService.paySeat(booking.concertSeatId, transactionManager);
+      await this.pointService.use(dto.toPayPointDTO(booking.price), transactionManager, { mode: PessimisticLockMode.PESSIMISTIC_WRTIE });
+      return await this.paymentService.create(
+        dto.toCreatePaymentDTO(booking.concertId, booking.concertScheduleId, booking.concertSeatId, booking.price),
+        transactionManager,
+      );
     });
 
     this.userQueueService.expire(dto.userQueueId);

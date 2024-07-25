@@ -12,6 +12,7 @@ export class ConcertBookingMapper {
       entity.price,
       entity.isPaid,
       entity.expiresAt,
+      entity.version,
     );
   }
 
@@ -26,6 +27,7 @@ export class ConcertBookingMapper {
     entity.price = domain.price;
     entity.isPaid = domain.isPaid;
     entity.expiresAt = domain.expiresAt;
+    entity.version = domain.version || 0;
 
     return entity;
   }

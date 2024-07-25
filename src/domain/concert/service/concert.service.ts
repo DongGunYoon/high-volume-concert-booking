@@ -4,7 +4,6 @@ import { ConcertScheduleRepository, ConcertScheduleRepositorySymbol } from '../i
 import { ConcertRepository, ConcertRepositorySymbol } from '../interface/repository/concert.repository';
 import { ConcertSeatRepository, ConcertSeatRepositorySymbol } from '../interface/repository/concert-seat.repository';
 import { ConcertSeat } from '../model/concert-seat.domain';
-import { CustomLock } from 'src/common/interface/database.interface';
 import { EntityManager } from 'typeorm';
 import { CreateConcertBookingDTO } from '../dto/create-concert-booking.dto';
 import { ConcertBooking } from '../model/concert-booking.domain';
@@ -71,8 +70,8 @@ export class ConcertService {
     return await this.concertBookingRepository.save(concertBooking, entityManager);
   }
 
-  async paySeat(seatId: number, entityManager: EntityManager, lock: CustomLock): Promise<ConcertSeat> {
-    const concertSeat = await this.concertSeatRepository.findOneById(seatId, entityManager, lock);
+  async paySeat(seatId: number, entityManager: EntityManager): Promise<ConcertSeat> {
+    const concertSeat = await this.concertSeatRepository.findOneById(seatId, entityManager);
 
     if (!concertSeat) {
       throw new CustomException(ErrorCode.SEAT_NOT_FOUND);
@@ -80,11 +79,17 @@ export class ConcertService {
 
     concertSeat.pay();
 
-    return await this.concertSeatRepository.save(concertSeat, entityManager);
+    const updated = await this.concertSeatRepository.update(concertSeat, entityManager);
+
+    if (!updated) {
+      throw new CustomException(ErrorCode.OPTIMISTIC_LOCK_CONFLICT);
+    }
+
+    return concertSeat;
   }
 
-  async payBooking(dto: PayConcertBookingDTO, entityManager: EntityManager, lock: CustomLock): Promise<ConcertBooking> {
-    const concertBooking = await this.concertBookingRepository.findOneById(dto.concertBookingId, entityManager, lock);
+  async payBooking(dto: PayConcertBookingDTO, entityManager: EntityManager): Promise<ConcertBooking> {
+    const concertBooking = await this.concertBookingRepository.findOneById(dto.concertBookingId, entityManager);
 
     if (!concertBooking) {
       throw new CustomException(ErrorCode.BOOKING_NOT_FOUND);
@@ -92,7 +97,13 @@ export class ConcertService {
 
     concertBooking.pay(dto.userId);
 
-    return await this.concertBookingRepository.save(concertBooking, entityManager);
+    const updated = await this.concertBookingRepository.update(concertBooking, entityManager);
+
+    if (!updated) {
+      throw new CustomException(ErrorCode.OPTIMISTIC_LOCK_CONFLICT);
+    }
+
+    return concertBooking;
   }
 
   async validateScheduleIsBookable(concertScheduleId: number): Promise<void> {
