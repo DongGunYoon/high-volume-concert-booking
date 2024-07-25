@@ -47,8 +47,8 @@ export class ConcertService {
     return await this.concertSeatRepository.findAllByConcertScheduleId(concertScheduleId);
   }
 
-  async bookSeat(concertSeatId: number, entityManager: EntityManager, lock: CustomLock): Promise<ConcertSeat> {
-    const concertSeat = await this.concertSeatRepository.findOneById(concertSeatId, entityManager, lock);
+  async bookSeat(concertSeatId: number, entityManager: EntityManager): Promise<ConcertSeat> {
+    const concertSeat = await this.concertSeatRepository.findOneById(concertSeatId, entityManager);
 
     if (!concertSeat) {
       throw new CustomException(ErrorCode.SEAT_NOT_FOUND);
@@ -56,7 +56,13 @@ export class ConcertService {
 
     concertSeat.book();
 
-    return await this.concertSeatRepository.save(concertSeat, entityManager);
+    const updated = await this.concertSeatRepository.update(concertSeat, entityManager);
+
+    if (!updated) {
+      throw new CustomException(ErrorCode.OPTIMISTIC_LOCK_CONFLICT);
+    }
+
+    return concertSeat;
   }
 
   async createBooking(dto: CreateConcertBookingDTO, entityManager: EntityManager): Promise<ConcertBooking> {

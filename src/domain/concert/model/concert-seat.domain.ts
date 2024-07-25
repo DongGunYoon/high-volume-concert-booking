@@ -13,6 +13,7 @@ export class ConcertSeat {
     public isPaid: boolean,
     public reservedUntil: Nullable<Date>,
     public concertSchedule?: ConcertSchedule,
+    public version?: number,
   ) {}
 
   book(): void {

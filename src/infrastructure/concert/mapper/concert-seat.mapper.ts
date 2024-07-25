@@ -13,6 +13,7 @@ export class ConcertSeatMapper {
       entity.isPaid,
       entity.reservedUntil,
       entity.concertSchedule && ConcertScheduleMapper.toDomain(entity.concertSchedule),
+      entity.version,
     );
   }
 
@@ -27,6 +28,7 @@ export class ConcertSeatMapper {
     entity.isPaid = domain.isPaid;
     entity.reservedUntil = domain.reservedUntil;
     entity.concertSchedule = domain.concertSchedule && ConcertScheduleMapper.toEntity(domain.concertSchedule);
+    entity.version = domain.version || 0;
 
     return entity;
   }
