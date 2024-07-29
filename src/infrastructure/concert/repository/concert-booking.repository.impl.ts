@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConcertBookingRepository } from 'src/domain/concert/interface/repository/concert-booking.repository';
 import { ConcertBooking } from 'src/domain/concert/model/concert-booking.domain';
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager, Repository, UpdateResult } from 'typeorm';
 import { ConcertBookingMapper } from '../mapper/concert-booking.mapper';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConcertBookingEntity } from '../entity/concert-booking.entity';
@@ -28,5 +28,18 @@ export class ConcertBookingRepositoryImpl implements ConcertBookingRepository {
     else await this.concertBookingRepository.save(entity);
 
     return ConcertBookingMapper.toDomain(entity);
+  }
+
+  async update(concertBooking: ConcertBooking, entityManager?: EntityManager): Promise<boolean> {
+    const entity = ConcertBookingMapper.toEntity(concertBooking);
+    let result: UpdateResult;
+
+    if (entityManager) {
+      result = await entityManager.update(ConcertBookingEntity, { id: entity.id, version: entity.version }, { ...entity, version: entity.version + 1 });
+    } else {
+      result = await this.concertBookingRepository.update({ id: entity.id, version: entity.version }, { ...entity, version: entity.version + 1 });
+    }
+
+    return !!result.affected;
   }
 }

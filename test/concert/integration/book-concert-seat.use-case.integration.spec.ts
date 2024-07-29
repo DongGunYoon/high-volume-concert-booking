@@ -20,6 +20,7 @@ import { UserMapper } from 'src/infrastructure/user/mapper/user.mapper';
 import { AuthModule } from 'src/module/auth.module';
 import { ConcertModule } from 'src/module/concert.module';
 import { Repository } from 'typeorm';
+import { ERROR_DETAILS } from 'src/common/constant/error-details';
 
 describe('BookConcertSeatUseCase', () => {
   let module: TestingModule;
@@ -98,6 +99,44 @@ describe('BookConcertSeatUseCase', () => {
 
       // Then
       await expect(book).rejects.toThrow('선택한 콘서트 좌석은 이미 판매되었습니다.');
+    });
+  });
+
+  describe('콘서트 좌석 예약 동시성 테스트', () => {
+    it(`2개의 예약이 동시에 발생했다면, 한 요청에 대해서 낙관적 에러가 발생합니다.`, async () => {
+      // Given
+      const schedule = await createBookableSchedule();
+      const seat = await createSeat(schedule.concertId, schedule.id, false, null);
+      const users = await Promise.all(Array.from({ length: 2 }, (_, i) => createUser(`User ${i + 1}`)));
+      const bookSeat = (userId: number) => bookConcertSeatUseCase.execute(new BookConcertSeatUseCaseDTO(userId, seat.concertScheduleId, seat.id));
+
+      // When
+      const results = await Promise.allSettled(users.map(user => bookSeat(user.id)));
+
+      // Then
+      const failedResult = results.find(result => result.status === 'rejected') as PromiseRejectedResult;
+      expect(failedResult).toBeDefined();
+      expect(failedResult.reason).toMatchObject({
+        status: ERROR_DETAILS.OPTIMISTIC_LOCK_CONFLICT.statusCode,
+        response: ERROR_DETAILS.OPTIMISTIC_LOCK_CONFLICT.message,
+      });
+    });
+
+    it(`100개의 동시 예약 요청이 들어와도, 하나의 요청만 성공해야 합니다.`, async () => {
+      // Given
+      const schedule = await createBookableSchedule();
+      const seat = await createSeat(schedule.concertId, schedule.id, false, null);
+      const users = await Promise.all(Array.from({ length: 100 }, (_, i) => createUser(`User ${i + 1}`)));
+      const bookSeat = (userId: number) => bookConcertSeatUseCase.execute(new BookConcertSeatUseCaseDTO(userId, seat.concertScheduleId, seat.id));
+
+      // When
+      const results = await Promise.allSettled(users.map(user => bookSeat(user.id)));
+
+      // Then
+      const successCount = results.filter(result => result.status === 'fulfilled').length;
+      const failedCount = results.filter(result => result.status === 'rejected').length;
+      expect(successCount).toBe(1);
+      expect(failedCount).toBe(99);
     });
   });
 

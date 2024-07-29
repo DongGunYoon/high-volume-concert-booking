@@ -26,6 +26,7 @@ import { ConcertModule } from 'src/module/concert.module';
 import { PointModule } from 'src/module/point.module';
 import { UserModule } from 'src/module/user.module';
 import { Repository } from 'typeorm';
+import { ERROR_DETAILS } from 'src/common/constant/error-details';
 
 describe('PayConcertBookingUseCase', () => {
   let module: TestingModule;
@@ -106,6 +107,44 @@ describe('PayConcertBookingUseCase', () => {
 
       // Then
       await expect(exectue).rejects.toThrow('내가 예약한 콘서트만 결제 가능합니다.');
+    });
+  });
+
+  describe('콘서트 예약 결제 동시성 테스트', () => {
+    it(`2건의 결제가 동시에 발생했다면, 한 요청에 대해서 낙관적 에러가 발생합니다.`, async () => {
+      // Given
+      const user = await createUser('예약자');
+      const booking = await createBookableBooking(user.id);
+      const payBooking = () => payConcertBookingUseCase.execute(new PayConcertBookingUseCaseDTO(user.id, 1, booking.id));
+      await setPoint(user.id, 100000);
+
+      // When
+      const results = await Promise.allSettled(Array.from({ length: 2 }, () => payBooking()));
+
+      // Then
+      const failedResult = results.find(result => result.status === 'rejected') as PromiseRejectedResult;
+      expect(failedResult).toBeDefined();
+      expect(failedResult.reason).toMatchObject({
+        status: ERROR_DETAILS.OPTIMISTIC_LOCK_CONFLICT.statusCode,
+        response: ERROR_DETAILS.OPTIMISTIC_LOCK_CONFLICT.message,
+      });
+    });
+
+    it(`100개의 동시 결제 요청이 들어와도, 하나의 요청만 성공해야 합니다.`, async () => {
+      // Given
+      const user = await createUser('예약자');
+      const booking = await createBookableBooking(user.id);
+      const payBooking = () => payConcertBookingUseCase.execute(new PayConcertBookingUseCaseDTO(user.id, 1, booking.id));
+      await setPoint(user.id, 100000);
+
+      // When
+      const results = await Promise.allSettled(Array.from({ length: 100 }, () => payBooking()));
+
+      // Then
+      const successCount = results.filter(result => result.status === 'fulfilled').length;
+      const failedCount = results.filter(result => result.status === 'rejected').length;
+      expect(successCount).toBe(1);
+      expect(failedCount).toBe(99);
     });
   });
 

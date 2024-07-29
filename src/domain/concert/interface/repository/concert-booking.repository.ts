@@ -8,4 +8,5 @@ export const ConcertBookingRepositorySymbol = Symbol.for('ConcertBookingReposito
 export interface ConcertBookingRepository {
   findOneById(id: number, entityManager?: EntityManager, lock?: CustomLock): Promise<Nullable<ConcertBooking>>;
   save(concertBooking: ConcertBooking, entityManager?: EntityManager): Promise<ConcertBooking>;
+  update(concertBooking: ConcertBooking, entityManager?: EntityManager): Promise<boolean>;
 }

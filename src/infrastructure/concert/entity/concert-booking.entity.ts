@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn, VersionColumn } from 'typeorm';
 
 @Index('unique_pending_booking', ['concertSeatId'], { where: "'isPaid' = 'true'", unique: true })
 @Entity('concert_bookings')
@@ -32,4 +32,7 @@ export class ConcertBookingEntity {
 
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
   updatedAt: Date;
+
+  @VersionColumn({ default: 0 })
+  version: number;
 }

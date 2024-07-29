@@ -3,7 +3,6 @@ import { BookConcertSeatUseCaseDTO } from 'src/application/concert/dto/book-conc
 import { BookConcertSeatUseCase } from 'src/domain/concert/interface/use-case/book-concert-seat.use-case';
 import { ConcertBooking } from 'src/domain/concert/model/concert-booking.domain';
 import { ConcertService } from 'src/domain/concert/service/concert.service';
-import { PessimisticLockMode } from 'src/common/enum/database.enum';
 import { DataSource } from 'typeorm';
 
 @Injectable()
@@ -17,7 +16,7 @@ export class BookConcertSeatUseCaseImpl implements BookConcertSeatUseCase {
     await this.concertService.validateScheduleIsBookable(dto.concertScheduleId);
 
     return await this.dataSource.transaction(async transactionManager => {
-      const bookedSeat = await this.concertService.bookSeat(dto.concertSeatId, transactionManager, { mode: PessimisticLockMode.PESSIMISTIC_WRTIE });
+      const bookedSeat = await this.concertService.bookSeat(dto.concertSeatId, transactionManager);
       return await this.concertService.createBooking(dto.toCreateConcertBookingDTO(bookedSeat.concertId, bookedSeat.price), transactionManager);
     });
   }

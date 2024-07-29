@@ -87,6 +87,10 @@ export const ERROR_DETAILS: Record<ErrorCode, ErrorDetail> = {
     message: '유저 대기열이 존재하지 않습니다.',
     statusCode: HttpStatus.NOT_FOUND,
   },
+  [ErrorCode.OPTIMISTIC_LOCK_CONFLICT]: {
+    message: '동시 요청으로 인해 작업을 완료할 수 없습니다. 잠시 후 다시 시도해 주세요.',
+    statusCode: HttpStatus.CONFLICT,
+  },
   [ErrorCode.INTERNAL_SERVER_ERROR]: {
     message: '핸들링 하지 못한 에러입니다.',
     statusCode: HttpStatus.INTERNAL_SERVER_ERROR,

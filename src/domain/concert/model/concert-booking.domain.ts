@@ -12,6 +12,7 @@ export class ConcertBooking {
     public price: number,
     public isPaid: boolean,
     public expiresAt: Date,
+    public version?: number,
   ) {}
 
   static create(dto: CreateConcertBookingDTO): ConcertBooking {

@@ -22,7 +22,7 @@ export class Point {
     this.amount += amount;
   }
 
-  pay(amount: number): void {
+  use(amount: number): void {
     if (amount <= 0) {
       throw new CustomException(ErrorCode.MINIMUM_PAYMENT_AMOUNT);
     }

@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ConcertSeatRepository } from 'src/domain/concert/interface/repository/concert-seat.repository';
 import { ConcertSeat } from 'src/domain/concert/model/concert-seat.domain';
 import { ConcertSeatEntity } from '../entity/concert-seat.entity';
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager, Repository, UpdateResult } from 'typeorm';
 import { ConcertSeatMapper } from '../mapper/concert-seat.mapper';
 import { Nullable } from 'src/common/type/native';
 import { CustomLock } from 'src/common/interface/database.interface';
@@ -34,5 +34,18 @@ export class ConcertSeatRepositoryImpl implements ConcertSeatRepository {
     else await this.concertSeatRepository.save(entity);
 
     return ConcertSeatMapper.toDomain(entity);
+  }
+
+  async update(concertSeat: ConcertSeat, entityManager?: EntityManager): Promise<boolean> {
+    const entity = ConcertSeatMapper.toEntity(concertSeat);
+    let result: UpdateResult;
+
+    if (entityManager) {
+      result = await entityManager.update(ConcertSeatEntity, { id: entity.id, version: entity.version }, { ...entity, version: entity.version + 1 });
+    } else {
+      result = await this.concertSeatRepository.update({ id: concertSeat.id, version: entity.version }, { ...entity, version: entity.version + 1 });
+    }
+
+    return !!result.affected;
   }
 }

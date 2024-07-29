@@ -42,10 +42,10 @@ export class PointService {
     return savedPoint;
   }
 
-  async pay(dto: PayPointDTO, entityManager: EntityManager, lock: CustomLock): Promise<Point> {
+  async use(dto: PayPointDTO, entityManager: EntityManager, lock: CustomLock): Promise<Point> {
     const point = await this.findOneByUserIdOrThrow(dto.userId, entityManager, lock);
 
-    point.pay(dto.amount);
+    point.use(dto.amount);
 
     const savedPoint = await this.pointRepository.save(point, entityManager);
 

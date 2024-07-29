@@ -12,11 +12,13 @@ import { UserMapper } from 'src/infrastructure/user/mapper/user.mapper';
 import { AuthModule } from 'src/module/auth.module';
 import { PointModule } from 'src/module/point.module';
 import { Repository } from 'typeorm';
+import { PointEntity } from 'src/infrastructure/point/entity/point.entity';
 
 describe('ChargePointUseCase', () => {
   let module: TestingModule;
   let chargePointUseCase: ChargePointUseCase;
   let userRepository: Repository<UserEntity>;
+  let pointRepository: Repository<Point>;
   let pointHistoryRepository: Repository<PointHistoryEntity>;
 
   beforeAll(async () => {
@@ -26,6 +28,7 @@ describe('ChargePointUseCase', () => {
 
     chargePointUseCase = module.get<ChargePointUseCase>(ChargePointUseCaseSymbol);
     userRepository = module.get(getRepositoryToken(UserEntity));
+    pointRepository = module.get(getRepositoryToken(PointEntity));
     pointHistoryRepository = module.get(getRepositoryToken(PointHistoryEntity));
   });
 
@@ -73,6 +76,34 @@ describe('ChargePointUseCase', () => {
 
       // Then
       await expect(chargeNegativeAmount).rejects.toThrow('충전 금액은 최소 0원 이상이어야 합니다.');
+    });
+  });
+
+  describe('포인트 충전 동시성 테스트', () => {
+    it(`100번의 충전이 발생한다면, 100번의 충전 금액이 모두 증가해야 합니다.`, async () => {
+      // Given
+      const user = await createUser('유저');
+      const charge = (amount: number) => chargePointUseCase.execute(new ChargePointUseCaseDTO(user.id, amount));
+
+      // When
+      await Promise.all(Array.from({ length: 100 }, () => charge(100)));
+
+      // Then
+      const point = await pointRepository.findOneByOrFail({ userId: user.id });
+      expect(point.amount).toBe(10000);
+    });
+
+    it(`100번의 충전이 발생한다면, 100건의 충전 내역이 쌓여야 합니다.`, async () => {
+      // Given
+      const user = await createUser('유저');
+      const charge = (amount: number) => chargePointUseCase.execute(new ChargePointUseCaseDTO(user.id, amount));
+
+      // When
+      await Promise.all(Array.from({ length: 100 }, () => charge(100)));
+
+      // Then
+      const pointHistoryCount = await pointHistoryRepository.countBy({ userId: user.id });
+      expect(pointHistoryCount).toBe(100);
     });
   });
 

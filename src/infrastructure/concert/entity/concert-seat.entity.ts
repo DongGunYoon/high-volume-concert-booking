@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn, VersionColumn } from 'typeorm';
 import { ConcertScheduleEntity } from './concert-schedule.entity';
 import { Nullable } from 'src/common/type/native';
 
@@ -34,4 +34,7 @@ export class ConcertSeatEntity {
   @ManyToOne(() => ConcertScheduleEntity, { createForeignKeyConstraints: false })
   @JoinColumn({ name: 'concert_schedule_id' })
   concertSchedule?: ConcertScheduleEntity;
+
+  @VersionColumn({ default: 0 })
+  version: number;
 }
