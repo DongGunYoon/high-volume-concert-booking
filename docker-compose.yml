@@ -24,6 +24,22 @@ services:
     ports:
       - '5433:5432'
 
+  redis:
+    image: redis:6.2-alpine
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis:/data
+
+  test-redis:
+    image: redis:6.2-alpine
+    ports:
+      - '6380:6379'
+    volumes:
+      - test-redis:/data
+
 volumes:
   postgres:
   test-postgres:
+  redis:
+  test-redis:
