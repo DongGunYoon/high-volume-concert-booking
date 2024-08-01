@@ -12,6 +12,7 @@ import { PayConcertBookingDTO } from '../dto/pay-concert-booking.dto';
 import { Concert } from '../model/concert.domain';
 import { CustomException } from 'src/common/exception/custom.exception';
 import { ErrorCode } from 'src/common/enum/error-code.enum';
+import { CreateConcertDTO } from '../dto/create-concert.dto';
 
 @Injectable()
 export class ConcertService {
@@ -21,6 +22,12 @@ export class ConcertService {
     @Inject(ConcertSeatRepositorySymbol) private readonly concertSeatRepository: ConcertSeatRepository,
     @Inject(ConcertBookingRepositorySymbol) private readonly concertBookingRepository: ConcertBookingRepository,
   ) {}
+
+  async create(dto: CreateConcertDTO): Promise<Concert> {
+    const concert = Concert.create(dto);
+
+    return await this.concertRepository.save(concert);
+  }
 
   async scanConcerts(): Promise<Concert[]> {
     return await this.concertRepository.findAll();
