@@ -6,3 +6,7 @@ export interface UserQueueTokenPayload {
   userId: number;
   userQueueId: number;
 }
+
+export interface TokenQueuePayload {
+  userId: number;
+}
