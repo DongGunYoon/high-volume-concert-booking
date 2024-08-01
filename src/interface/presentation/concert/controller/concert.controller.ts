@@ -17,12 +17,15 @@ import { ConcertResponse } from '../dto/response/concert.response';
 import { ScanConcertsUseCase, ScanConcertsUseCaseSymbol } from 'src/domain/concert/interface/use-case/scan-concerts.use-case';
 import { CreateConcertRequest } from '../dto/request/create-concert.request';
 import { CreateConcertUseCase } from 'src/application/concert/use-case/create-concert.use-case.impl';
+import { CreateConcertScheduleRequest } from '../dto/request/create-concert-schedule.request';
+import { CreateConcertScheduleUseCase } from 'src/application/concert/use-case/create-concert-schedule.use-case.impl';
 
 @ApiTags('콘서트 관련 API')
 @Controller('concerts')
 export class ConcertController {
   constructor(
     private readonly createConcertUseCase: CreateConcertUseCase,
+    private readonly createConcertScheduleUseCase: CreateConcertScheduleUseCase,
     @Inject(ScanConcertsUseCaseSymbol) private readonly scanConcertsUseCase: ScanConcertsUseCase,
     @Inject(ScanBookableSchedulesUseCaseSymbol) private readonly scanBookableScheduelsUseCase: ScanBookableSchedulesUseCase,
     @Inject(ScanConcertSeatsUseCaseSymbol) private readonly scanConcertSeatsUseCase: ScanConcertSeatsUseCase,
@@ -54,6 +57,21 @@ export class ConcertController {
     const concerts = await this.scanConcertsUseCase.execute();
 
     return concerts.map(concert => ConcertResponse.from(concert));
+  }
+
+  /**
+   * 콘서트 스케쥴을 생성합니다.
+   * @summary 콘서트 스케쥴 생성
+   * @returns
+   */
+  @Post(':concertId/schedules')
+  async createConcertSchedule(
+    @Param('concertId', ParseIntPipe) concertId: number,
+    @Body() request: CreateConcertScheduleRequest,
+  ): Promise<ConcertScheduleResponse> {
+    const schedule = await this.createConcertScheduleUseCase.execute(request.toUseCaseDTO(concertId));
+
+    return ConcertScheduleResponse.from(schedule);
   }
 
   /**

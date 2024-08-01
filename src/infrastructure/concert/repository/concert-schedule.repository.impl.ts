@@ -3,13 +3,22 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ConcertScheduleRepository } from 'src/domain/concert/interface/repository/concert-schedule.repository';
 import { ConcertSchedule } from 'src/domain/concert/model/concert-schedule.domain';
 import { ConcertScheduleEntity } from '../entity/concert-schedule.entity';
-import { LessThanOrEqual, MoreThan, Repository } from 'typeorm';
+import { EntityManager, LessThanOrEqual, MoreThan, Repository } from 'typeorm';
 import { ConcertScheduleMapper } from '../mapper/concert-schedule.mapper';
 import { Nullable } from 'src/common/type/native';
 
 @Injectable()
 export class ConcertScheduleRepositoryImpl implements ConcertScheduleRepository {
   constructor(@InjectRepository(ConcertScheduleEntity) private readonly concertScheduleRepository: Repository<ConcertScheduleEntity>) {}
+
+  async save(concertSchedule: ConcertSchedule, entityManager?: EntityManager): Promise<ConcertSchedule> {
+    const entity = ConcertScheduleMapper.toEntity(concertSchedule);
+
+    if (entityManager) await entityManager.save(entity);
+    else await this.concertScheduleRepository.save(entity);
+
+    return ConcertScheduleMapper.toDomain(entity);
+  }
 
   async existsById(id: number): Promise<boolean> {
     return await this.concertScheduleRepository.existsBy({ id });

@@ -13,6 +13,7 @@ import { Concert } from '../model/concert.domain';
 import { CustomException } from 'src/common/exception/custom.exception';
 import { ErrorCode } from 'src/common/enum/error-code.enum';
 import { CreateConcertDTO } from '../dto/create-concert.dto';
+import { CreateConcertScheduleDTO } from '../dto/create-concert-schedule.dto';
 
 @Injectable()
 export class ConcertService {
@@ -31,6 +32,18 @@ export class ConcertService {
 
   async scanConcerts(): Promise<Concert[]> {
     return await this.concertRepository.findAll();
+  }
+
+  async createSchedule(dto: CreateConcertScheduleDTO): Promise<ConcertSchedule> {
+    const concertExists = await this.concertRepository.existsById(dto.concertId);
+
+    if (!concertExists) {
+      throw new CustomException(ErrorCode.CONCERT_NOT_FOUND);
+    }
+
+    const schedule = ConcertSchedule.create(dto);
+
+    return await this.concertScheduleRepository.save(schedule);
   }
 
   async scanBookableSchedueles(concertId: number): Promise<ConcertSchedule[]> {

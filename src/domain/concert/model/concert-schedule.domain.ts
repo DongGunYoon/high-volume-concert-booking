@@ -1,6 +1,7 @@
 import { Concert } from './concert.domain';
 import { CustomException } from 'src/common/exception/custom.exception';
 import { ErrorCode } from 'src/common/enum/error-code.enum';
+import { CreateConcertScheduleDTO } from '../dto/create-concert-schedule.dto';
 
 export class ConcertSchedule {
   constructor(
@@ -12,6 +13,10 @@ export class ConcertSchedule {
     public endAt: Date,
     public concert?: Concert,
   ) {}
+
+  static create(dto: CreateConcertScheduleDTO): ConcertSchedule {
+    return new ConcertSchedule(0, dto.concertId, dto.bookingStartAt, dto.bookingEndAt, dto.startAt, dto.endAt);
+  }
 
   validateBookable(): void {
     if (this.bookingStartAt > new Date()) {
