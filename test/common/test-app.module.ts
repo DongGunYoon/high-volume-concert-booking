@@ -1,5 +1,5 @@
 import { Module, ValidationPipe } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TestTypeORMConfig } from 'test/common/test-typeorm.config';
@@ -21,11 +21,14 @@ import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ApiExceptionFilter } from 'src/common/filter/api-exception.filter';
 import { ApiResponseInterceptor } from 'src/common/interceptor/api.interceptor';
 import { LoggerModule } from 'src/module/logger.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import { TestCacheConfig } from './test-cache.config';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(TestTypeORMConfig),
     ConfigModule.forRoot({ isGlobal: true }),
+    CacheModule.registerAsync(TestCacheConfig),
     TypeOrmModule.forFeature([
       UserEntity,
       UserQueueEntity,
