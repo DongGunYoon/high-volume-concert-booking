@@ -4,6 +4,7 @@ import { Request } from 'express';
 import { UserQueueService } from 'src/domain/user/service/user-queue.service';
 import { CustomException } from '../exception/custom.exception';
 import { ErrorCode } from '../enum/error-code.enum';
+import { TokenQueueService } from 'src/domain/token/service/token-queue.service';
 
 @Injectable()
 export class UserAuthGuard implements CanActivate {
@@ -54,6 +55,40 @@ export class UserQueueAuthGuard implements CanActivate {
       const userQueue = await this.userQueueService.getByIdOrThrow(payload.userQueueId);
 
       if (userQueue.expiresAt! < new Date()) {
+        throw new CustomException(ErrorCode.TOKEN_EXPIRED);
+      }
+
+      request['user'] = payload;
+    } catch {
+      throw new CustomException(ErrorCode.INVALID_TOKEN);
+    }
+    return true;
+  }
+}
+
+@Injectable()
+export class TokenQueueAuthGuard implements CanActivate {
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly tokenQueueService: TokenQueueService,
+  ) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest();
+    const token = extractTokenFromHeader(request);
+
+    if (!token) {
+      throw new CustomException(ErrorCode.TOKEN_NOT_PROVIDED);
+    }
+
+    try {
+      const payload = await this.jwtService.verifyAsync(token, {
+        secret: process.env.JWT_TOKEN_QUEUE_SECRET,
+      });
+
+      const tokenQueue = await this.tokenQueueService.getActiveToken(payload.userId);
+
+      if (!tokenQueue) {
         throw new CustomException(ErrorCode.TOKEN_EXPIRED);
       }
 

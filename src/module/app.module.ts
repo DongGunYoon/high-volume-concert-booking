@@ -11,12 +11,23 @@ import { LoggerModule } from './logger.module';
 import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ApiExceptionFilter } from 'src/common/filter/api-exception.filter';
 import { ApiResponseInterceptor } from 'src/common/interceptor/api.interceptor';
+import { RedisCacheModule } from './cache.module';
+import { TokenModule } from './token.module';
+import { RedisModule } from '@nestjs-modules/ioredis';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(TypeORMConfig),
     ConfigModule.forRoot({ isGlobal: true }),
     ScheduleModule.forRoot(),
+    RedisModule.forRootAsync({
+      useFactory: () => ({
+        type: 'single',
+        url: process.env.REDIS_URL,
+      }),
+    }),
+    TokenModule,
+    RedisCacheModule,
     ConcertModule,
     PointModule,
     UserModule,

@@ -11,6 +11,8 @@ import { TestTypeORMConfig } from 'test/common/test-typeorm.config';
 import { AuthModule } from 'src/module/auth.module';
 import { ConcertModule } from 'src/module/concert.module';
 import { Repository } from 'typeorm';
+import { CacheModule } from '@nestjs/cache-manager';
+import { TestCacheConfig } from 'test/common/test-cache.config';
 
 describe('ScanBookableSchedulesUseCase', () => {
   let module: TestingModule;
@@ -20,7 +22,7 @@ describe('ScanBookableSchedulesUseCase', () => {
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
-      imports: [TypeOrmModule.forRoot(TestTypeORMConfig), ConcertModule, AuthModule],
+      imports: [TypeOrmModule.forRoot(TestTypeORMConfig), CacheModule.registerAsync(TestCacheConfig), ConcertModule, AuthModule],
     }).compile();
 
     scanBookableSchedulesUseCase = module.get<ScanBookableSchedulesUseCase>(ScanBookableSchedulesUseCaseSymbol);
@@ -84,6 +86,22 @@ describe('ScanBookableSchedulesUseCase', () => {
 
       // Then
       await expect(execute).rejects.toThrow(`콘서트가 존재하지 않습니다.`);
+    });
+  });
+
+  describe('예약 가능한 스케쥴 목록 캐시 테스트', () => {
+    it('100번의 조회 요청이 들어와도, 한번의 DB 요청만 진행되어야 합니다.', async () => {
+      // Given
+      const concert = await createConcert('콘서트');
+      const spy = jest.spyOn(concertScheduleRepository, 'find');
+      const scanBookableSchedules = () => scanBookableSchedulesUseCase.execute(concert.id);
+      await scanBookableSchedules();
+
+      // When
+      await Promise.all(Array.from({ length: 100 }, () => scanBookableSchedules()));
+
+      // Then
+      expect(spy).toHaveBeenCalledTimes(1);
     });
   });
 
