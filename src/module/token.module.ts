@@ -22,6 +22,6 @@ import { TokenQueueScheduler } from 'src/interface/scheduler/token-queue.schedul
     WaitingTokenQueueRepository,
     ActiveTokenQueueRepository,
   ],
-  exports: [TokenQueueService],
+  exports: [TokenQueueService, WaitingTokenQueueRepository, ActiveTokenQueueRepository],
 })
 export class TokenModule {}

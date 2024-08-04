@@ -1,6 +1,8 @@
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
-import { UserQueueAuthGuard } from 'src/common/guard/auth.guard';
+import { CreateConcertScheduleUseCase } from 'src/application/concert/use-case/create-concert-schedule.use-case.impl';
+import { CreateConcertUseCase } from 'src/application/concert/use-case/create-concert.use-case.impl';
+import { TokenQueueAuthGuard } from 'src/common/guard/auth.guard';
 import { ConcertPaymentType } from 'src/domain/concert/enum/concert.enum';
 import { BookConcertSeatUseCase, BookConcertSeatUseCaseSymbol } from 'src/domain/concert/interface/use-case/book-concert-seat.use-case';
 import { PayConcertBookingUseCase, PayConcertBookingUseCaseSymbol } from 'src/domain/concert/interface/use-case/pay-concert-booking.use-case';
@@ -12,7 +14,7 @@ import { ConcertPayment } from 'src/domain/concert/model/concert-payment.domain'
 import { ConcertSchedule } from 'src/domain/concert/model/concert-schedule.domain';
 import { ConcertSeat } from 'src/domain/concert/model/concert-seat.domain';
 import { Concert } from 'src/domain/concert/model/concert.domain';
-import { UserQueueService } from 'src/domain/user/service/user-queue.service';
+import { TokenQueueService } from 'src/domain/token/service/token-queue.service';
 import { ConcertController } from 'src/interface/presentation/concert/controller/concert.controller';
 import { BookConcertSeatRequest } from 'src/interface/presentation/concert/dto/request/book-concert-seat.request';
 import { PayConcertBookingRequest } from 'src/interface/presentation/concert/dto/request/pay-concert-booking.request';
@@ -32,15 +34,17 @@ describe('ConcertController', () => {
     const module = await Test.createTestingModule({
       controllers: [ConcertController],
       providers: [
+        { provide: CreateConcertUseCase, useValue: { exectute: jest.fn() } },
+        { provide: CreateConcertScheduleUseCase, useValue: { exectute: jest.fn() } },
         { provide: ScanConcertsUseCaseSymbol, useValue: { execute: jest.fn() } },
         { provide: ScanBookableSchedulesUseCaseSymbol, useValue: { execute: jest.fn() } },
         { provide: ScanConcertSeatsUseCaseSymbol, useValue: { execute: jest.fn() } },
         { provide: BookConcertSeatUseCaseSymbol, useValue: { execute: jest.fn() } },
         { provide: PayConcertBookingUseCaseSymbol, useValue: { execute: jest.fn() } },
         { provide: JwtService, useValue: { sign: jest.fn(), verify: jest.fn() } },
-        { provide: UserQueueService, useValue: { getByIdOrThrow: jest.fn() } },
+        { provide: TokenQueueService, useValue: { getByIdOrThrow: jest.fn() } },
         {
-          provide: UserQueueAuthGuard,
+          provide: TokenQueueAuthGuard,
           useValue: { canActivate: jest.fn().mockReturnValue(true) },
         },
       ],
@@ -94,7 +98,7 @@ describe('ConcertController', () => {
       jest.spyOn(bookConcertSeatUseCase, 'execute').mockResolvedValue(concertBooking);
 
       // When
-      const response = await concertController.bookConcertSeat(1, new BookConcertSeatRequest(1), { userId: 1, userQueueId: 1 });
+      const response = await concertController.bookConcertSeat(1, new BookConcertSeatRequest(1), { userId: 1 });
 
       // Then
       expect(response).toBeInstanceOf(ConcertBookingResponse);
@@ -112,7 +116,7 @@ describe('ConcertController', () => {
       jest.spyOn(payConcertBookingUseCase, 'execute').mockResolvedValue(concertPayment);
 
       // When
-      const response = await concertController.payConcertBooking(1, new PayConcertBookingRequest(), { userId: 1, userQueueId: 1 });
+      const response = await concertController.payConcertBooking(1, new PayConcertBookingRequest(), { userId: 1 });
 
       // Then
       expect(response).toBeInstanceOf(ConcertPaymentResponse);

@@ -27,6 +27,10 @@ import { PointModule } from 'src/module/point.module';
 import { UserModule } from 'src/module/user.module';
 import { Repository } from 'typeorm';
 import { ERROR_DETAILS } from 'src/common/constant/error-details';
+import { CacheModule } from '@nestjs/cache-manager';
+import { TestCacheConfig } from 'test/common/test-cache.config';
+import { RedisModule } from '@nestjs-modules/ioredis';
+import { TestRedisConfig } from 'test/common/test-redis.config';
 
 describe('PayConcertBookingUseCase', () => {
   let module: TestingModule;
@@ -40,7 +44,15 @@ describe('PayConcertBookingUseCase', () => {
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
-      imports: [TypeOrmModule.forRoot(TestTypeORMConfig), ConcertModule, AuthModule, PointModule, UserModule],
+      imports: [
+        TypeOrmModule.forRoot(TestTypeORMConfig),
+        CacheModule.registerAsync(TestCacheConfig),
+        RedisModule.forRootAsync(TestRedisConfig),
+        ConcertModule,
+        AuthModule,
+        PointModule,
+        UserModule,
+      ],
     }).compile();
 
     payConcertBookingUseCase = module.get<PayConcertBookingUseCase>(PayConcertBookingUseCaseSymbol);
@@ -64,7 +76,7 @@ describe('PayConcertBookingUseCase', () => {
       await setPoint(user.id, 100000);
 
       // When
-      const concertPayment = await payConcertBookingUseCase.execute(new PayConcertBookingUseCaseDTO(user.id, 1, booking.id));
+      const concertPayment = await payConcertBookingUseCase.execute(new PayConcertBookingUseCaseDTO(user.id, booking.id));
 
       // Then
       expect(concertPayment).toBeInstanceOf(ConcertPayment);
@@ -77,7 +89,7 @@ describe('PayConcertBookingUseCase', () => {
       const user = await createUser('예약자');
 
       // When
-      const exectue = async () => await payConcertBookingUseCase.execute(new PayConcertBookingUseCaseDTO(user.id, 1, -1));
+      const exectue = async () => await payConcertBookingUseCase.execute(new PayConcertBookingUseCaseDTO(user.id, -1));
 
       // Then
       await expect(exectue).rejects.toThrow('콘서트 예약이 존재하지 않습니다.');
@@ -90,7 +102,7 @@ describe('PayConcertBookingUseCase', () => {
       await setPoint(user.id, 0);
 
       // When
-      const exectue = async () => await payConcertBookingUseCase.execute(new PayConcertBookingUseCaseDTO(user.id, 1, booking.id));
+      const exectue = async () => await payConcertBookingUseCase.execute(new PayConcertBookingUseCaseDTO(user.id, booking.id));
 
       // Then
       await expect(exectue).rejects.toThrow('결제에 필요한 금액이 모자릅니다.');
@@ -103,7 +115,7 @@ describe('PayConcertBookingUseCase', () => {
       await setPoint(user.id, 100000);
 
       // When
-      const exectue = async () => await payConcertBookingUseCase.execute(new PayConcertBookingUseCaseDTO(-1, 1, booking.id));
+      const exectue = async () => await payConcertBookingUseCase.execute(new PayConcertBookingUseCaseDTO(-1, booking.id));
 
       // Then
       await expect(exectue).rejects.toThrow('내가 예약한 콘서트만 결제 가능합니다.');
@@ -115,7 +127,7 @@ describe('PayConcertBookingUseCase', () => {
       // Given
       const user = await createUser('예약자');
       const booking = await createBookableBooking(user.id);
-      const payBooking = () => payConcertBookingUseCase.execute(new PayConcertBookingUseCaseDTO(user.id, 1, booking.id));
+      const payBooking = () => payConcertBookingUseCase.execute(new PayConcertBookingUseCaseDTO(user.id, booking.id));
       await setPoint(user.id, 100000);
 
       // When
@@ -134,7 +146,7 @@ describe('PayConcertBookingUseCase', () => {
       // Given
       const user = await createUser('예약자');
       const booking = await createBookableBooking(user.id);
-      const payBooking = () => payConcertBookingUseCase.execute(new PayConcertBookingUseCaseDTO(user.id, 1, booking.id));
+      const payBooking = () => payConcertBookingUseCase.execute(new PayConcertBookingUseCaseDTO(user.id, booking.id));
       await setPoint(user.id, 100000);
 
       // When

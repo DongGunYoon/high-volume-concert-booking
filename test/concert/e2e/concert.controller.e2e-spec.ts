@@ -1,3 +1,4 @@
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { plainToInstance } from 'class-transformer';
@@ -15,6 +16,7 @@ import { TestDataService } from 'test/common/test-data.service';
 
 describe('ConcertController (e2e)', () => {
   let app: INestApplication;
+  let cacheManager: Cache;
   let testDataService: TestDataService;
 
   beforeAll(async () => {
@@ -26,6 +28,11 @@ describe('ConcertController (e2e)', () => {
     await app.init();
 
     testDataService = module.get<TestDataService>(TestDataService);
+    cacheManager = module.get(CACHE_MANAGER);
+  });
+
+  beforeEach(async () => {
+    await cacheManager.reset();
   });
 
   afterAll(async () => {
@@ -37,12 +44,12 @@ describe('ConcertController (e2e)', () => {
     it('아무런 콘서트가 생성되지 않았다면 빈 배열을 반환합니다.', async () => {
       // Given
       const user = await testDataService.createUser('유저');
-      const userQueue = await testDataService.createTokenIssuedUserQueue(user.id);
+      const tokenQueue = await testDataService.createActiveTokenQueue(user.id);
 
       // When
       const result = await request(app.getHttpServer())
         .get(`/concerts`)
-        .auth(userQueue.token!, { type: 'bearer' })
+        .auth(tokenQueue.token!, { type: 'bearer' })
         .expect(200)
         .then(res => res.body);
 
@@ -56,12 +63,12 @@ describe('ConcertController (e2e)', () => {
       // Given
       await Promise.all(Array.from({ length: 10 }, (_, i) => testDataService.createConcert(`콘서트${i}`)));
       const user = await testDataService.createUser('유저');
-      const userQueue = await testDataService.createTokenIssuedUserQueue(user.id);
+      const tokenQueue = await testDataService.createActiveTokenQueue(user.id);
 
       // When
       const result = await request(app.getHttpServer())
         .get(`/concerts`)
-        .auth(userQueue.token!, { type: 'bearer' })
+        .auth(tokenQueue.token!, { type: 'bearer' })
         .expect(200)
         .then(res => res.body);
 
@@ -92,13 +99,13 @@ describe('ConcertController (e2e)', () => {
     it('아무런 콘서트 스케쥴이 생성되지 않았다면 빈 배열을 반환합니다.', async () => {
       // Given
       const user = await testDataService.createUser('유저');
-      const userQueue = await testDataService.createTokenIssuedUserQueue(user.id);
+      const tokenQueue = await testDataService.createActiveTokenQueue(user.id);
       const concert = await testDataService.createConcert('콘서트');
 
       // When
       const result = await request(app.getHttpServer())
         .get(`/concerts/${concert.id}/schedules/bookable`)
-        .auth(userQueue.token!, { type: 'bearer' })
+        .auth(tokenQueue.token!, { type: 'bearer' })
         .expect(200)
         .then(res => res.body);
 
@@ -111,7 +118,7 @@ describe('ConcertController (e2e)', () => {
     it('콘서트 스케쥴이 여러 개 존재한다면, 예약 가능한 스케쥴 목록을 반환합니다.', async () => {
       // Given
       const user = await testDataService.createUser('유저');
-      const userQueue = await testDataService.createTokenIssuedUserQueue(user.id);
+      const tokenQueue = await testDataService.createActiveTokenQueue(user.id);
       const concert = await testDataService.createConcert('콘서트');
       await Promise.all(Array.from({ length: 5 }, () => testDataService.createBookableSchedule(concert.id)));
       await Promise.all(Array.from({ length: 3 }, () => testDataService.createNonBookableSchedule(concert.id)));
@@ -119,7 +126,7 @@ describe('ConcertController (e2e)', () => {
       // When
       const result = await request(app.getHttpServer())
         .get(`/concerts/${concert.id}/schedules/bookable`)
-        .auth(userQueue.token!, { type: 'bearer' })
+        .auth(tokenQueue.token!, { type: 'bearer' })
         .expect(200)
         .then(res => res.body);
 
@@ -134,13 +141,13 @@ describe('ConcertController (e2e)', () => {
     it('입력한 ID에 콘서트가 존재하지 않다면, 관련된 에러가 반환됩니다.', async () => {
       // Given
       const user = await testDataService.createUser('유저');
-      const userQueue = await testDataService.createTokenIssuedUserQueue(user.id);
+      const tokenQueue = await testDataService.createActiveTokenQueue(user.id);
       const nonExistConcertId = -1;
 
       // When
       const result = await request(app.getHttpServer())
         .get(`/concerts/${nonExistConcertId}/schedules/bookable`)
-        .auth(userQueue.token!, { type: 'bearer' })
+        .auth(tokenQueue.token!, { type: 'bearer' })
         .expect(200)
         .then(res => res.body);
 
@@ -177,14 +184,14 @@ describe('ConcertController (e2e)', () => {
     it('아무런 콘서트 좌석이 생성되지 않았다면 빈 배열을 반환합니다.', async () => {
       // Given
       const user = await testDataService.createUser('유저');
-      const userQueue = await testDataService.createTokenIssuedUserQueue(user.id);
+      const tokenQueue = await testDataService.createActiveTokenQueue(user.id);
       const concert = await testDataService.createConcert('콘서트');
       const schedule = await testDataService.createBookableSchedule(concert.id);
 
       // When
       const result = await request(app.getHttpServer())
         .get(`/concerts/schedules/${schedule.id}/seats`)
-        .auth(userQueue.token!, { type: 'bearer' })
+        .auth(tokenQueue.token!, { type: 'bearer' })
         .expect(200)
         .then(res => res.body);
 
@@ -197,7 +204,7 @@ describe('ConcertController (e2e)', () => {
     it('콘서트 좌석이 여러 개 존재한다면, 해당 스케쥴 목록을 반환합니다.', async () => {
       // Given
       const user = await testDataService.createUser('유저');
-      const userQueue = await testDataService.createTokenIssuedUserQueue(user.id);
+      const tokenQueue = await testDataService.createActiveTokenQueue(user.id);
       const concert = await testDataService.createConcert('콘서트');
       const schedule = await testDataService.createBookableSchedule(concert.id);
       await Promise.all(Array.from({ length: 4 }, () => testDataService.createSeat(concert.id, schedule.id)));
@@ -205,7 +212,7 @@ describe('ConcertController (e2e)', () => {
       // When
       const result = await request(app.getHttpServer())
         .get(`/concerts/schedules/${schedule.id}/seats`)
-        .auth(userQueue.token!, { type: 'bearer' })
+        .auth(tokenQueue.token!, { type: 'bearer' })
         .expect(200)
         .then(res => res.body);
 
@@ -219,13 +226,13 @@ describe('ConcertController (e2e)', () => {
     it('입력한 ID에 콘서트 스케쥴이 존재하지 않다면, 관련된 에러가 반환됩니다.', async () => {
       // Given
       const user = await testDataService.createUser('유저');
-      const userQueue = await testDataService.createTokenIssuedUserQueue(user.id);
+      const tokenQueue = await testDataService.createActiveTokenQueue(user.id);
       const nonExistScheduleId = -1;
 
       // When
       const result = await request(app.getHttpServer())
         .get(`/concerts/schedules/${nonExistScheduleId}/seats`)
-        .auth(userQueue.token!, { type: 'bearer' })
+        .auth(tokenQueue.token!, { type: 'bearer' })
         .expect(200)
         .then(res => res.body);
 
@@ -263,7 +270,7 @@ describe('ConcertController (e2e)', () => {
     it('콘서트 좌석 예약이 성공적으로 이루어지면, 예약 정보가 반환됩니다.', async () => {
       // Given
       const user = await testDataService.createUser('유저');
-      const userQueue = await testDataService.createTokenIssuedUserQueue(user.id);
+      const tokenQueue = await testDataService.createActiveTokenQueue(user.id);
       const concert = await testDataService.createConcert('콘서트');
       const schedule = await testDataService.createBookableSchedule(concert.id);
       const seat = await testDataService.createSeat(concert.id, schedule.id, 1000);
@@ -272,7 +279,7 @@ describe('ConcertController (e2e)', () => {
       const result = await request(app.getHttpServer())
         .post(`/concerts/seats/${seat.id}/book`)
         .send({ concertScheduleId: schedule.id })
-        .auth(userQueue.token!, { type: 'bearer' })
+        .auth(tokenQueue.token!, { type: 'bearer' })
         .expect(200)
         .then(res => res.body);
 
@@ -287,7 +294,7 @@ describe('ConcertController (e2e)', () => {
     it('콘서트 좌석 예약이 성공적으로 이루어지면, 좌석이 점유 상태로 변경됩니다.', async () => {
       // Given
       const user = await testDataService.createUser('유저');
-      const userQueue = await testDataService.createTokenIssuedUserQueue(user.id);
+      const tokenQueue = await testDataService.createActiveTokenQueue(user.id);
       const concert = await testDataService.createConcert('콘서트');
       const schedule = await testDataService.createBookableSchedule(concert.id);
       const seat = await testDataService.createSeat(concert.id, schedule.id, 1000);
@@ -296,7 +303,7 @@ describe('ConcertController (e2e)', () => {
       await request(app.getHttpServer())
         .post(`/concerts/seats/${seat.id}/book`)
         .send({ concertScheduleId: schedule.id })
-        .auth(userQueue.token!, { type: 'bearer' })
+        .auth(tokenQueue.token!, { type: 'bearer' })
         .expect(200)
         .then(res => res.body);
 
@@ -311,7 +318,7 @@ describe('ConcertController (e2e)', () => {
     it('콘서트 좌석 예약이 성공적으로 이루어지면, 콘서트 예약 데이터가 생성됩니다.', async () => {
       // Given
       const user = await testDataService.createUser('유저');
-      const userQueue = await testDataService.createTokenIssuedUserQueue(user.id);
+      const tokenQueue = await testDataService.createActiveTokenQueue(user.id);
       const concert = await testDataService.createConcert('콘서트');
       const schedule = await testDataService.createBookableSchedule(concert.id);
       const seat = await testDataService.createSeat(concert.id, schedule.id, 1000);
@@ -320,7 +327,7 @@ describe('ConcertController (e2e)', () => {
       await request(app.getHttpServer())
         .post(`/concerts/seats/${seat.id}/book`)
         .send({ concertScheduleId: schedule.id })
-        .auth(userQueue.token!, { type: 'bearer' })
+        .auth(tokenQueue.token!, { type: 'bearer' })
         .expect(200)
         .then(res => res.body);
 
@@ -336,7 +343,7 @@ describe('ConcertController (e2e)', () => {
     it('콘서트 스케쥴의 예약 가능 시간이 지났다면, 관련된 에러가 반환됩니다.', async () => {
       // Given
       const user = await testDataService.createUser('유저');
-      const userQueue = await testDataService.createTokenIssuedUserQueue(user.id);
+      const tokenQueue = await testDataService.createActiveTokenQueue(user.id);
       const concert = await testDataService.createConcert('콘서트');
       const schedule = await testDataService.createNonBookableSchedule(concert.id);
       const seat = await testDataService.createSeat(concert.id, schedule.id, 1000);
@@ -345,7 +352,7 @@ describe('ConcertController (e2e)', () => {
       const result = await request(app.getHttpServer())
         .post(`/concerts/seats/${seat.id}/book`)
         .send({ concertScheduleId: schedule.id })
-        .auth(userQueue.token!, { type: 'bearer' })
+        .auth(tokenQueue.token!, { type: 'bearer' })
         .expect(200)
         .then(res => res.body);
 
@@ -361,7 +368,7 @@ describe('ConcertController (e2e)', () => {
     it('콘서트 좌석이 이미 예약이 되었다면, 관련된 에러가 반환됩니다.', async () => {
       // Given
       const user = await testDataService.createUser('유저');
-      const userQueue = await testDataService.createTokenIssuedUserQueue(user.id);
+      const tokenQueue = await testDataService.createActiveTokenQueue(user.id);
       const concert = await testDataService.createConcert('콘서트');
       const schedule = await testDataService.createBookableSchedule(concert.id);
       const seat = await testDataService.createSeat(concert.id, schedule.id, 1000, false, new Date(Date.now() + 10000));
@@ -370,7 +377,7 @@ describe('ConcertController (e2e)', () => {
       const result = await request(app.getHttpServer())
         .post(`/concerts/seats/${seat.id}/book`)
         .send({ concertScheduleId: schedule.id })
-        .auth(userQueue.token!, { type: 'bearer' })
+        .auth(tokenQueue.token!, { type: 'bearer' })
         .expect(200)
         .then(res => res.body);
 
@@ -386,7 +393,7 @@ describe('ConcertController (e2e)', () => {
     it('콘서트 좌석이 이미 판매가 되었다면, 관련된 에러가 반환됩니다.', async () => {
       // Given
       const user = await testDataService.createUser('유저');
-      const userQueue = await testDataService.createTokenIssuedUserQueue(user.id);
+      const tokenQueue = await testDataService.createActiveTokenQueue(user.id);
       const concert = await testDataService.createConcert('콘서트');
       const schedule = await testDataService.createBookableSchedule(concert.id);
       const seat = await testDataService.createSeat(concert.id, schedule.id, 1000, true);
@@ -395,7 +402,7 @@ describe('ConcertController (e2e)', () => {
       const result = await request(app.getHttpServer())
         .post(`/concerts/seats/${seat.id}/book`)
         .send({ concertScheduleId: schedule.id })
-        .auth(userQueue.token!, { type: 'bearer' })
+        .auth(tokenQueue.token!, { type: 'bearer' })
         .expect(200)
         .then(res => res.body);
 
@@ -411,7 +418,7 @@ describe('ConcertController (e2e)', () => {
     it('입력한 ID에 콘서트 좌석이 존재하지 않다면, 관련된 에러가 반환됩니다.', async () => {
       // Given
       const user = await testDataService.createUser('유저');
-      const userQueue = await testDataService.createTokenIssuedUserQueue(user.id);
+      const tokenQueue = await testDataService.createActiveTokenQueue(user.id);
       const concert = await testDataService.createConcert('콘서트');
       const schedule = await testDataService.createBookableSchedule(concert.id);
       const nonExistSeatId = -1;
@@ -420,7 +427,7 @@ describe('ConcertController (e2e)', () => {
       const result = await request(app.getHttpServer())
         .post(`/concerts/seats/${nonExistSeatId}/book`)
         .send({ concertScheduleId: schedule.id })
-        .auth(userQueue.token!, { type: 'bearer' })
+        .auth(tokenQueue.token!, { type: 'bearer' })
         .expect(200)
         .then(res => res.body);
 
@@ -460,7 +467,7 @@ describe('ConcertController (e2e)', () => {
     it('예약한 콘서트의 결제가 성공적으로 이루어지면, 결제 정보가 반환됩니다.', async () => {
       // Given
       const user = await testDataService.createUser('유저');
-      const userQueue = await testDataService.createTokenIssuedUserQueue(user.id);
+      const tokenQueue = await testDataService.createActiveTokenQueue(user.id);
       const concert = await testDataService.createConcert('콘서트');
       const schedule = await testDataService.createBookableSchedule(concert.id);
       const seat = await testDataService.createSeat(concert.id, schedule.id, 1000, false, new Date(Date.now() + 10000));
@@ -470,7 +477,7 @@ describe('ConcertController (e2e)', () => {
       // When
       const result = await request(app.getHttpServer())
         .post(`/concerts/bookings/${booking.id}/pay`)
-        .auth(userQueue.token!, { type: 'bearer' })
+        .auth(tokenQueue.token!, { type: 'bearer' })
         .expect(200)
         .then(res => res.body);
 
@@ -484,7 +491,7 @@ describe('ConcertController (e2e)', () => {
     it('예약한 콘서트의 결제가 성공적으로 이루어지면, 콘서트 좌석이 결제됨 상태로 변경됩니다.', async () => {
       // Given
       const user = await testDataService.createUser('유저');
-      const userQueue = await testDataService.createTokenIssuedUserQueue(user.id);
+      const tokenQueue = await testDataService.createActiveTokenQueue(user.id);
       const concert = await testDataService.createConcert('콘서트');
       const schedule = await testDataService.createBookableSchedule(concert.id);
       const seat = await testDataService.createSeat(concert.id, schedule.id, 1000, false, new Date(Date.now() + 10000));
@@ -494,7 +501,7 @@ describe('ConcertController (e2e)', () => {
       // When
       await request(app.getHttpServer())
         .post(`/concerts/bookings/${booking.id}/pay`)
-        .auth(userQueue.token!, { type: 'bearer' })
+        .auth(tokenQueue.token!, { type: 'bearer' })
         .expect(200)
         .then(res => res.body);
 
@@ -509,7 +516,7 @@ describe('ConcertController (e2e)', () => {
     it('예약한 콘서트의 결제가 성공적으로 이루어지면, 콘서트 예약이 결제됨 상태로 변경됩니다.', async () => {
       // Given
       const user = await testDataService.createUser('유저');
-      const userQueue = await testDataService.createTokenIssuedUserQueue(user.id);
+      const tokenQueue = await testDataService.createActiveTokenQueue(user.id);
       const concert = await testDataService.createConcert('콘서트');
       const schedule = await testDataService.createBookableSchedule(concert.id);
       const seat = await testDataService.createSeat(concert.id, schedule.id, 1000, false, new Date(Date.now() + 10000));
@@ -519,7 +526,7 @@ describe('ConcertController (e2e)', () => {
       // When
       await request(app.getHttpServer())
         .post(`/concerts/bookings/${booking.id}/pay`)
-        .auth(userQueue.token!, { type: 'bearer' })
+        .auth(tokenQueue.token!, { type: 'bearer' })
         .expect(200)
         .then(res => res.body);
 
@@ -533,7 +540,7 @@ describe('ConcertController (e2e)', () => {
     it('예약한 콘서트의 결제가 성공적으로 이루어지면, 포인트 사용 내역이 생성됩니다.', async () => {
       // Given
       const user = await testDataService.createUser('유저');
-      const userQueue = await testDataService.createTokenIssuedUserQueue(user.id);
+      const tokenQueue = await testDataService.createActiveTokenQueue(user.id);
       const concert = await testDataService.createConcert('콘서트');
       const schedule = await testDataService.createBookableSchedule(concert.id);
       const seat = await testDataService.createSeat(concert.id, schedule.id, 1000, false, new Date(Date.now() + 10000));
@@ -543,7 +550,7 @@ describe('ConcertController (e2e)', () => {
       // When
       await request(app.getHttpServer())
         .post(`/concerts/bookings/${booking.id}/pay`)
-        .auth(userQueue.token!, { type: 'bearer' })
+        .auth(tokenQueue.token!, { type: 'bearer' })
         .expect(200)
         .then(res => res.body);
 
@@ -557,7 +564,7 @@ describe('ConcertController (e2e)', () => {
     it('예약한 콘서트의 결제가 성공적으로 이루어지면, 콘서트 결제 데이터가 생성됩니다.', async () => {
       // Given
       const user = await testDataService.createUser('유저');
-      const userQueue = await testDataService.createTokenIssuedUserQueue(user.id);
+      const tokenQueue = await testDataService.createActiveTokenQueue(user.id);
       const concert = await testDataService.createConcert('콘서트');
       const schedule = await testDataService.createBookableSchedule(concert.id);
       const seat = await testDataService.createSeat(concert.id, schedule.id, 1000, false, new Date(Date.now() + 10000));
@@ -567,7 +574,7 @@ describe('ConcertController (e2e)', () => {
       // When
       await request(app.getHttpServer())
         .post(`/concerts/bookings/${booking.id}/pay`)
-        .auth(userQueue.token!, { type: 'bearer' })
+        .auth(tokenQueue.token!, { type: 'bearer' })
         .expect(200)
         .then(res => res.body);
 
@@ -584,7 +591,7 @@ describe('ConcertController (e2e)', () => {
     it('콘서트 결제에 필요한 금액이 모자르다면, 관련된 에러가 반환됩니다.', async () => {
       // Given
       const user = await testDataService.createUser('유저');
-      const userQueue = await testDataService.createTokenIssuedUserQueue(user.id);
+      const tokenQueue = await testDataService.createActiveTokenQueue(user.id);
       const concert = await testDataService.createConcert('콘서트');
       const schedule = await testDataService.createBookableSchedule(concert.id);
       const seat = await testDataService.createSeat(concert.id, schedule.id, 1000, false, new Date(Date.now() + 10000));
@@ -593,7 +600,7 @@ describe('ConcertController (e2e)', () => {
       // When
       const result = await request(app.getHttpServer())
         .post(`/concerts/bookings/${booking.id}/pay`)
-        .auth(userQueue.token!, { type: 'bearer' })
+        .auth(tokenQueue.token!, { type: 'bearer' })
         .expect(200)
         .then(res => res.body);
 
@@ -609,7 +616,7 @@ describe('ConcertController (e2e)', () => {
     it('콘서트 예약자가 아닌 유저가 결제를 시도하면, 관련된 에러가 반환됩니다.', async () => {
       // Given
       const user = await testDataService.createUser('유저');
-      const userQueue = await testDataService.createTokenIssuedUserQueue(user.id);
+      const tokenQueue = await testDataService.createActiveTokenQueue(user.id);
       const reserver = await testDataService.createUser('예약자');
       const concert = await testDataService.createConcert('콘서트');
       const schedule = await testDataService.createBookableSchedule(concert.id);
@@ -619,7 +626,7 @@ describe('ConcertController (e2e)', () => {
       // When
       const result = await request(app.getHttpServer())
         .post(`/concerts/bookings/${booking.id}/pay`)
-        .auth(userQueue.token!, { type: 'bearer' })
+        .auth(tokenQueue.token!, { type: 'bearer' })
         .expect(200)
         .then(res => res.body);
 
@@ -635,7 +642,7 @@ describe('ConcertController (e2e)', () => {
     it('이미 결제가 진행된 예약에 결제를 시도하면, 관련된 에러가 반환됩니다.', async () => {
       // Given
       const user = await testDataService.createUser('유저');
-      const userQueue = await testDataService.createTokenIssuedUserQueue(user.id);
+      const tokenQueue = await testDataService.createActiveTokenQueue(user.id);
       const concert = await testDataService.createConcert('콘서트');
       const schedule = await testDataService.createBookableSchedule(concert.id);
       const seat = await testDataService.createSeat(concert.id, schedule.id, 1000, false, new Date(Date.now() + 10000));
@@ -644,7 +651,7 @@ describe('ConcertController (e2e)', () => {
       // When
       const result = await request(app.getHttpServer())
         .post(`/concerts/bookings/${alreadyPaidBooking.id}/pay`)
-        .auth(userQueue.token!, { type: 'bearer' })
+        .auth(tokenQueue.token!, { type: 'bearer' })
         .expect(200)
         .then(res => res.body);
 
@@ -660,7 +667,7 @@ describe('ConcertController (e2e)', () => {
     it('결제 만료시간이 지난 예약에 결제를 시도하면, 관련된 에러가 반환됩니다.', async () => {
       // Given
       const user = await testDataService.createUser('유저');
-      const userQueue = await testDataService.createTokenIssuedUserQueue(user.id);
+      const tokenQueue = await testDataService.createActiveTokenQueue(user.id);
       const concert = await testDataService.createConcert('콘서트');
       const schedule = await testDataService.createBookableSchedule(concert.id);
       const seat = await testDataService.createSeat(concert.id, schedule.id, 1000, false, new Date(Date.now() + 10000));
@@ -669,7 +676,7 @@ describe('ConcertController (e2e)', () => {
       // When
       const result = await request(app.getHttpServer())
         .post(`/concerts/bookings/${expiredBooking.id}/pay`)
-        .auth(userQueue.token!, { type: 'bearer' })
+        .auth(tokenQueue.token!, { type: 'bearer' })
         .expect(200)
         .then(res => res.body);
 
@@ -685,7 +692,7 @@ describe('ConcertController (e2e)', () => {
     it('좌석 점유시간이 지난 예약에 결제를 시도하면, 관련된 에러가 반환됩니다.', async () => {
       // Given
       const user = await testDataService.createUser('유저');
-      const userQueue = await testDataService.createTokenIssuedUserQueue(user.id);
+      const tokenQueue = await testDataService.createActiveTokenQueue(user.id);
       const concert = await testDataService.createConcert('콘서트');
       const schedule = await testDataService.createBookableSchedule(concert.id);
       const expiredSeat = await testDataService.createSeat(concert.id, schedule.id, 1000, false, new Date(Date.now()));
@@ -694,7 +701,7 @@ describe('ConcertController (e2e)', () => {
       // When
       const result = await request(app.getHttpServer())
         .post(`/concerts/bookings/${booking.id}/pay`)
-        .auth(userQueue.token!, { type: 'bearer' })
+        .auth(tokenQueue.token!, { type: 'bearer' })
         .expect(200)
         .then(res => res.body);
 
@@ -710,7 +717,7 @@ describe('ConcertController (e2e)', () => {
     it('입력한 ID에 콘서트 예약이 존재하지 않다면, 관련된 에러가 반환됩니다.', async () => {
       // Given
       const user = await testDataService.createUser('유저');
-      const userQueue = await testDataService.createTokenIssuedUserQueue(user.id);
+      const tokenQueue = await testDataService.createActiveTokenQueue(user.id);
       const concert = await testDataService.createConcert('콘서트');
       await testDataService.createBookableSchedule(concert.id);
       const nonExistBookingId = -1;
@@ -718,7 +725,7 @@ describe('ConcertController (e2e)', () => {
       // When
       const result = await request(app.getHttpServer())
         .post(`/concerts/bookings/${nonExistBookingId}/pay`)
-        .auth(userQueue.token!, { type: 'bearer' })
+        .auth(tokenQueue.token!, { type: 'bearer' })
         .expect(200)
         .then(res => res.body);
 

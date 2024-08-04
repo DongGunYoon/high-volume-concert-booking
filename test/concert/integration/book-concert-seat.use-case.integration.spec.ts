@@ -21,6 +21,10 @@ import { AuthModule } from 'src/module/auth.module';
 import { ConcertModule } from 'src/module/concert.module';
 import { Repository } from 'typeorm';
 import { ERROR_DETAILS } from 'src/common/constant/error-details';
+import { RedisModule } from '@nestjs-modules/ioredis';
+import { TestRedisConfig } from 'test/common/test-redis.config';
+import { CacheModule } from '@nestjs/cache-manager';
+import { TestCacheConfig } from 'test/common/test-cache.config';
 
 describe('BookConcertSeatUseCase', () => {
   let module: TestingModule;
@@ -32,7 +36,13 @@ describe('BookConcertSeatUseCase', () => {
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
-      imports: [TypeOrmModule.forRoot(TestTypeORMConfig), ConcertModule, AuthModule],
+      imports: [
+        TypeOrmModule.forRoot(TestTypeORMConfig),
+        CacheModule.registerAsync(TestCacheConfig),
+        RedisModule.forRootAsync(TestRedisConfig),
+        ConcertModule,
+        AuthModule,
+      ],
     }).compile();
 
     bookConcertSeatUseCase = module.get<BookConcertSeatUseCase>(BookConcertSeatUseCaseSymbol);

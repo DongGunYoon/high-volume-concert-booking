@@ -1,3 +1,4 @@
+import { RedisModule } from '@nestjs-modules/ioredis';
 import { CACHE_MANAGER, CacheModule } from '@nestjs/cache-manager';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -7,6 +8,7 @@ import { CreateConcertUseCase } from 'src/application/concert/use-case/create-co
 import { AuthModule } from 'src/module/auth.module';
 import { ConcertModule } from 'src/module/concert.module';
 import { TestCacheConfig } from 'test/common/test-cache.config';
+import { TestRedisConfig } from 'test/common/test-redis.config';
 import { TestTypeORMConfig } from 'test/common/test-typeorm.config';
 
 describe('CreateConcertUseCase', () => {
@@ -16,7 +18,13 @@ describe('CreateConcertUseCase', () => {
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
-      imports: [TypeOrmModule.forRoot(TestTypeORMConfig), CacheModule.registerAsync(TestCacheConfig), ConcertModule, AuthModule],
+      imports: [
+        TypeOrmModule.forRoot(TestTypeORMConfig),
+        CacheModule.registerAsync(TestCacheConfig),
+        RedisModule.forRootAsync(TestRedisConfig),
+        ConcertModule,
+        AuthModule,
+      ],
     }).compile();
 
     cacheManager = module.get(CACHE_MANAGER);

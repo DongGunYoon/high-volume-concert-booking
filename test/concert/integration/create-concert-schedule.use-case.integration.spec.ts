@@ -1,9 +1,9 @@
+import { RedisModule } from '@nestjs-modules/ioredis';
 import { CACHE_MANAGER, CacheModule } from '@nestjs/cache-manager';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 import { Cache } from 'cache-manager';
 import { CreateConcertScheduleUseCaseDTO } from 'src/application/concert/dto/create-concert-schedule.use-case.dto';
-import { CreateConcertUseCaseDTO } from 'src/application/concert/dto/create-concert-use-case.dto';
 import { CreateConcertScheduleUseCase } from 'src/application/concert/use-case/create-concert-schedule.use-case.impl';
 import { Concert } from 'src/domain/concert/model/concert.domain';
 import { ConcertEntity } from 'src/infrastructure/concert/entity/concert.entity';
@@ -11,6 +11,7 @@ import { ConcertMapper } from 'src/infrastructure/concert/mapper/concert.mapper'
 import { AuthModule } from 'src/module/auth.module';
 import { ConcertModule } from 'src/module/concert.module';
 import { TestCacheConfig } from 'test/common/test-cache.config';
+import { TestRedisConfig } from 'test/common/test-redis.config';
 import { TestTypeORMConfig } from 'test/common/test-typeorm.config';
 import { Repository } from 'typeorm';
 
@@ -22,7 +23,13 @@ describe('CreateConcertScheduleUseCase', () => {
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
-      imports: [TypeOrmModule.forRoot(TestTypeORMConfig), CacheModule.registerAsync(TestCacheConfig), ConcertModule, AuthModule],
+      imports: [
+        TypeOrmModule.forRoot(TestTypeORMConfig),
+        CacheModule.registerAsync(TestCacheConfig),
+        RedisModule.forRootAsync(TestRedisConfig),
+        ConcertModule,
+        AuthModule,
+      ],
     }).compile();
 
     cacheManager = module.get(CACHE_MANAGER);

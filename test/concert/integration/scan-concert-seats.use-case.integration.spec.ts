@@ -14,6 +14,10 @@ import { TestTypeORMConfig } from 'test/common/test-typeorm.config';
 import { AuthModule } from 'src/module/auth.module';
 import { ConcertModule } from 'src/module/concert.module';
 import { Repository } from 'typeorm';
+import { RedisModule } from '@nestjs-modules/ioredis';
+import { TestRedisConfig } from 'test/common/test-redis.config';
+import { CacheModule } from '@nestjs/cache-manager';
+import { TestCacheConfig } from 'test/common/test-cache.config';
 
 describe('ScanConcertSeatsUseCase', () => {
   let module: TestingModule;
@@ -24,7 +28,13 @@ describe('ScanConcertSeatsUseCase', () => {
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
-      imports: [TypeOrmModule.forRoot(TestTypeORMConfig), ConcertModule, AuthModule],
+      imports: [
+        TypeOrmModule.forRoot(TestTypeORMConfig),
+        CacheModule.registerAsync(TestCacheConfig),
+        RedisModule.forRootAsync(TestRedisConfig),
+        ConcertModule,
+        AuthModule,
+      ],
     }).compile();
 
     scanConcertSeatsUseCase = module.get<ScanConcertSeatsUseCase>(ScanConcertSeatsUseCaseSymbol);

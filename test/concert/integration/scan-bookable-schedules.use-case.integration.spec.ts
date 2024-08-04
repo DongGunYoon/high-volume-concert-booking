@@ -13,6 +13,8 @@ import { ConcertModule } from 'src/module/concert.module';
 import { Repository } from 'typeorm';
 import { CacheModule } from '@nestjs/cache-manager';
 import { TestCacheConfig } from 'test/common/test-cache.config';
+import { RedisModule } from '@nestjs-modules/ioredis';
+import { TestRedisConfig } from 'test/common/test-redis.config';
 
 describe('ScanBookableSchedulesUseCase', () => {
   let module: TestingModule;
@@ -22,7 +24,13 @@ describe('ScanBookableSchedulesUseCase', () => {
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
-      imports: [TypeOrmModule.forRoot(TestTypeORMConfig), CacheModule.registerAsync(TestCacheConfig), ConcertModule, AuthModule],
+      imports: [
+        TypeOrmModule.forRoot(TestTypeORMConfig),
+        CacheModule.registerAsync(TestCacheConfig),
+        RedisModule.forRootAsync(TestRedisConfig),
+        ConcertModule,
+        AuthModule,
+      ],
     }).compile();
 
     scanBookableSchedulesUseCase = module.get<ScanBookableSchedulesUseCase>(ScanBookableSchedulesUseCaseSymbol);

@@ -8,6 +8,7 @@ import { ConcertSchedule } from 'src/domain/concert/model/concert-schedule.domai
 import { ConcertSeat } from 'src/domain/concert/model/concert-seat.domain';
 import { Concert } from 'src/domain/concert/model/concert.domain';
 import { PointHistory } from 'src/domain/point/model/point-history.domain';
+import { TokenQueue } from 'src/domain/token/model/token-queue.domain';
 import { UserQueue } from 'src/domain/user/model/user-queue.domain';
 import { User } from 'src/domain/user/model/user.domain';
 import { ConcertBookingEntity } from 'src/infrastructure/concert/entity/concert-booking.entity';
@@ -23,6 +24,8 @@ import { ConcertMapper } from 'src/infrastructure/concert/mapper/concert.mapper'
 import { PointHistoryEntity } from 'src/infrastructure/point/entity/point-history.entity';
 import { PointEntity } from 'src/infrastructure/point/entity/point.entity';
 import { PointHistoryMapper } from 'src/infrastructure/point/mapper/point-history.mapper';
+import { ActiveTokenQueueRepository } from 'src/infrastructure/token/active-token-queue.repository.impl';
+import { WaitingTokenQueueRepository } from 'src/infrastructure/token/waiting-token-queue.repository.impl';
 import { UserQueueEntity } from 'src/infrastructure/user/entity/user-queue.entity';
 import { UserEntity } from 'src/infrastructure/user/entity/user.entity';
 import { UserQueueMapper } from 'src/infrastructure/user/mapper/user-queue.mapper';
@@ -50,6 +53,8 @@ export class TestDataService {
     private bookingRepository: Repository<ConcertBookingEntity>,
     @InjectRepository(ConcertPaymentEntity)
     private paymentRepository: Repository<ConcertPaymentEntity>,
+    private readonly waitingTokenQueueRepository: WaitingTokenQueueRepository,
+    private readonly activeTokenQueueRepository: ActiveTokenQueueRepository,
   ) {}
 
   createUser = async (name: string): Promise<User> => {
@@ -72,6 +77,20 @@ export class TestDataService {
     const userQueueEntity = UserQueueMapper.toEntity(userQueue);
 
     return UserQueueMapper.toDomain(await this.queueRepository.save(userQueueEntity));
+  };
+
+  createWaitingTokenQueue = async (userId: number): Promise<TokenQueue> => {
+    await this.waitingTokenQueueRepository.add(userId.toString());
+
+    return TokenQueue.createWaiting(userId, 1);
+  };
+
+  createActiveTokenQueue = async (userId: number): Promise<TokenQueue> => {
+    const token = TokenQueue.generateToken(userId);
+
+    await this.activeTokenQueueRepository.add(userId.toString(), token);
+
+    return TokenQueue.createActive(token);
   };
 
   getPointHistory = async (userId: number): Promise<PointHistory> => {

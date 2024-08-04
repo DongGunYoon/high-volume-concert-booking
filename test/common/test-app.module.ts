@@ -1,5 +1,5 @@
 import { Module, ValidationPipe } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TestTypeORMConfig } from 'test/common/test-typeorm.config';
@@ -24,18 +24,15 @@ import { LoggerModule } from 'src/module/logger.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { TestCacheConfig } from './test-cache.config';
 import { RedisModule } from '@nestjs-modules/ioredis';
+import { TestRedisConfig } from './test-redis.config';
+import { TokenModule } from 'src/module/token.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(TestTypeORMConfig),
     ConfigModule.forRoot({ isGlobal: true }),
     CacheModule.registerAsync(TestCacheConfig),
-    RedisModule.forRootAsync({
-      useFactory: () => ({
-        type: 'single',
-        url: process.env.TEST_REDIS_URL,
-      }),
-    }),
+    RedisModule.forRootAsync(TestRedisConfig),
     TypeOrmModule.forFeature([
       UserEntity,
       UserQueueEntity,
@@ -51,6 +48,7 @@ import { RedisModule } from '@nestjs-modules/ioredis';
     ConcertModule,
     PointModule,
     UserModule,
+    TokenModule,
     AuthModule,
     LoggerModule,
   ],
