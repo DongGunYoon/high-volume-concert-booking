@@ -5,11 +5,11 @@ import { ConcertBookingResponse } from '../dto/response/concert-booking.response
 import { ConcertPaymentResponse } from '../dto/response/concert-payment.response';
 import { ScanBookableSchedulesUseCase, ScanBookableSchedulesUseCaseSymbol } from 'src/domain/concert/interface/use-case/scan-bookable-schedules.use-case';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { UserQueueAuthGuard } from 'src/common/guard/auth.guard';
+import { TokenQueueAuthGuard } from 'src/common/guard/auth.guard';
 import { ScanConcertSeatsUseCase, ScanConcertSeatsUseCaseSymbol } from 'src/domain/concert/interface/use-case/scan-concert-seats.use-case';
 import { BookConcertSeatUseCase, BookConcertSeatUseCaseSymbol } from 'src/domain/concert/interface/use-case/book-concert-seat.use-case';
 import { TokenPayload } from 'src/common/decorator/auth.decorator';
-import { UserQueueTokenPayload } from 'src/common/interface/auth.interface';
+import { TokenQueuePayload } from 'src/common/interface/auth.interface';
 import { BookConcertSeatRequest } from '../dto/request/book-concert-seat.request';
 import { PayConcertBookingUseCase, PayConcertBookingUseCaseSymbol } from 'src/domain/concert/interface/use-case/pay-concert-booking.use-case';
 import { PayConcertBookingRequest } from '../dto/request/pay-concert-booking.request';
@@ -51,7 +51,7 @@ export class ConcertController {
    * @returns
    */
   @ApiBearerAuth()
-  @UseGuards(UserQueueAuthGuard)
+  @UseGuards(TokenQueueAuthGuard)
   @Get()
   async scanConcerts(): Promise<ConcertResponse[]> {
     const concerts = await this.scanConcertsUseCase.execute();
@@ -81,7 +81,7 @@ export class ConcertController {
    * @returns
    */
   @ApiBearerAuth()
-  @UseGuards(UserQueueAuthGuard)
+  @UseGuards(TokenQueueAuthGuard)
   @Get(':concertId/schedules/bookable')
   async scanBookableSchedules(@Param('concertId', ParseIntPipe) concertId: number): Promise<ConcertScheduleResponse[]> {
     const bookableSchedules = await this.scanBookableScheduelsUseCase.execute(concertId);
@@ -96,7 +96,7 @@ export class ConcertController {
    * @returns
    */
   @ApiBearerAuth()
-  @UseGuards(UserQueueAuthGuard)
+  @UseGuards(TokenQueueAuthGuard)
   @Get('schedules/:concertScheduleId/seats')
   async scanConcertSeats(@Param('concertScheduleId', ParseIntPipe) concertScheduleId: number): Promise<ConcertSeatResponse[]> {
     const concertSeats = await this.scanConcertSeatsUseCase.execute(concertScheduleId);
@@ -111,12 +111,12 @@ export class ConcertController {
    * @returns
    */
   @ApiBearerAuth()
-  @UseGuards(UserQueueAuthGuard)
+  @UseGuards(TokenQueueAuthGuard)
   @Post('seats/:concertSeatId/book')
   async bookConcertSeat(
     @Param('concertSeatId', ParseIntPipe) concertSeatId: number,
     @Body() request: BookConcertSeatRequest,
-    @TokenPayload<UserQueueTokenPayload>() payload: UserQueueTokenPayload,
+    @TokenPayload<TokenQueuePayload>() payload: TokenQueuePayload,
   ): Promise<ConcertBookingResponse> {
     const concertBooking = await this.bookConcertSeatUseCase.execute(request.toUseCaseDTO(payload.userId, concertSeatId));
 
@@ -130,14 +130,14 @@ export class ConcertController {
    * @returns
    */
   @ApiBearerAuth()
-  @UseGuards(UserQueueAuthGuard)
+  @UseGuards(TokenQueueAuthGuard)
   @Post('bookings/:concertBookingId/pay')
   async payConcertBooking(
     @Param('concertBookingId', ParseIntPipe) concertBookingId: number,
     @Body() request: PayConcertBookingRequest,
-    @TokenPayload<UserQueueTokenPayload>() payload: UserQueueTokenPayload,
+    @TokenPayload<TokenQueuePayload>() payload: TokenQueuePayload,
   ): Promise<ConcertPaymentResponse> {
-    const concertPayment = await this.payConcertBookingUseCase.execute(request.toUseCaseDTO(payload.userId, payload.userQueueId, concertBookingId));
+    const concertPayment = await this.payConcertBookingUseCase.execute(request.toUseCaseDTO(payload.userId, concertBookingId));
 
     return ConcertPaymentResponse.from(concertPayment);
   }

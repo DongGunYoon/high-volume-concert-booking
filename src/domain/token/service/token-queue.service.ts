@@ -55,4 +55,8 @@ export class TokenQueueService {
 
     await this.waitingTokenQueueRepository.remove(userIds);
   }
+
+  async expire(id: number): Promise<void> {
+    await this.activeTokenQueueRepository.remove(id.toString());
+  }
 }

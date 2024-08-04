@@ -33,6 +33,7 @@ import { ScanConcertsUseCaseImpl } from 'src/application/concert/use-case/scan-c
 import { ScanConcertsUseCaseSymbol } from 'src/domain/concert/interface/use-case/scan-concerts.use-case';
 import { CreateConcertUseCase } from 'src/application/concert/use-case/create-concert.use-case.impl';
 import { CreateConcertScheduleUseCase } from 'src/application/concert/use-case/create-concert-schedule.use-case.impl';
+import { TokenModule } from './token.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { CreateConcertScheduleUseCase } from 'src/application/concert/use-case/c
     AuthModule,
     UserModule,
     PointModule,
+    TokenModule,
   ],
   controllers: [ConcertController],
   providers: [

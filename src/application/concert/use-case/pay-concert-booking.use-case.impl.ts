@@ -6,8 +6,8 @@ import { ConcertService } from 'src/domain/concert/service/concert.service';
 import { PaymentService } from 'src/domain/concert/service/payment.service';
 import { PessimisticLockMode } from 'src/common/enum/database.enum';
 import { PointService } from 'src/domain/point/service/point.service';
-import { UserQueueService } from 'src/domain/user/service/user-queue.service';
 import { DataSource } from 'typeorm';
+import { TokenQueueService } from 'src/domain/token/service/token-queue.service';
 
 @Injectable()
 export class PayConcertBookingUseCaseImpl implements PayConcertBookingUseCase {
@@ -15,7 +15,7 @@ export class PayConcertBookingUseCaseImpl implements PayConcertBookingUseCase {
     private readonly concertService: ConcertService,
     private readonly paymentService: PaymentService,
     private readonly pointService: PointService,
-    private readonly userQueueService: UserQueueService,
+    private readonly tokenQueueService: TokenQueueService,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -30,7 +30,7 @@ export class PayConcertBookingUseCaseImpl implements PayConcertBookingUseCase {
       );
     });
 
-    this.userQueueService.expire(dto.userQueueId);
+    this.tokenQueueService.expire(dto.userId);
 
     return payment;
   }

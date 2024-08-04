@@ -23,12 +23,19 @@ import { ApiResponseInterceptor } from 'src/common/interceptor/api.interceptor';
 import { LoggerModule } from 'src/module/logger.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { TestCacheConfig } from './test-cache.config';
+import { RedisModule } from '@nestjs-modules/ioredis';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(TestTypeORMConfig),
     ConfigModule.forRoot({ isGlobal: true }),
     CacheModule.registerAsync(TestCacheConfig),
+    RedisModule.forRootAsync({
+      useFactory: () => ({
+        type: 'single',
+        url: process.env.TEST_REDIS_URL,
+      }),
+    }),
     TypeOrmModule.forFeature([
       UserEntity,
       UserQueueEntity,

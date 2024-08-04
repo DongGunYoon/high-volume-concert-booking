@@ -16,7 +16,9 @@ export class WaitingTokenQueueRepository {
   async getOrder(member: string): Promise<Nullable<number>> {
     const rankIdx = await this.redis.zrank(this.WAITING_TOKENS_KEY, member);
 
-    if (rankIdx == null) return null;
+    if (rankIdx == null) {
+      return null;
+    }
 
     return rankIdx + 1;
   }

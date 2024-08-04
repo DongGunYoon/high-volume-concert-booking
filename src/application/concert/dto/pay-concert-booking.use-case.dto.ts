@@ -7,12 +7,10 @@ import { PointTransactionType } from 'src/domain/point/enum/point.enum';
 
 export class PayConcertBookingUseCaseDTO {
   userId: number;
-  userQueueId: number;
   concertBookingId: number;
 
-  constructor(userId: number, userQueueId: number, concertBookingId: number) {
+  constructor(userId: number, concertBookingId: number) {
     this.userId = userId;
-    this.userQueueId = userQueueId;
     this.concertBookingId = concertBookingId;
   }
 
