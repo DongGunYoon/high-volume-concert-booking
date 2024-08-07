@@ -14,12 +14,14 @@ import { ApiResponseInterceptor } from 'src/common/interceptor/api.interceptor';
 import { RedisCacheModule } from './cache.module';
 import { TokenModule } from './token.module';
 import { RedisModule } from '@nestjs-modules/ioredis';
+import { CqrsModule } from '@nestjs/cqrs';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(TypeORMConfig),
     ConfigModule.forRoot({ isGlobal: true }),
     ScheduleModule.forRoot(),
+    CqrsModule.forRoot(),
     RedisModule.forRootAsync({
       useFactory: () => ({
         type: 'single',

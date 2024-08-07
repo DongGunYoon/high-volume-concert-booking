@@ -26,6 +26,7 @@ import { TestCacheConfig } from './test-cache.config';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { TestRedisConfig } from './test-redis.config';
 import { TokenModule } from 'src/module/token.module';
+import { CqrsModule } from '@nestjs/cqrs';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { TokenModule } from 'src/module/token.module';
     ConfigModule.forRoot({ isGlobal: true }),
     CacheModule.registerAsync(TestCacheConfig),
     RedisModule.forRootAsync(TestRedisConfig),
+    CqrsModule.forRoot(),
     TypeOrmModule.forFeature([
       UserEntity,
       UserQueueEntity,
