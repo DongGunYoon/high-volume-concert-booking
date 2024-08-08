@@ -31,6 +31,9 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { TestCacheConfig } from 'test/common/test-cache.config';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { TestRedisConfig } from 'test/common/test-redis.config';
+import { CqrsModule, EventBus } from '@nestjs/cqrs';
+import { PaymentCompletedEvent } from 'src/event/payment/payment-completed.event';
+import { EventTrasactionIdEnum } from 'src/common/enum/event.enum';
 
 describe('PayConcertBookingUseCase', () => {
   let module: TestingModule;
@@ -41,6 +44,7 @@ describe('PayConcertBookingUseCase', () => {
   let concertScheduleRepository: Repository<ConcertScheduleEntity>;
   let concertSeatRepository: Repository<ConcertSeatEntity>;
   let concertBookingRepository: Repository<ConcertBookingEntity>;
+  let eventBus: EventBus;
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
@@ -48,6 +52,7 @@ describe('PayConcertBookingUseCase', () => {
         TypeOrmModule.forRoot(TestTypeORMConfig),
         CacheModule.registerAsync(TestCacheConfig),
         RedisModule.forRootAsync(TestRedisConfig),
+        CqrsModule.forRoot(),
         ConcertModule,
         AuthModule,
         PointModule,
@@ -62,6 +67,7 @@ describe('PayConcertBookingUseCase', () => {
     concertScheduleRepository = module.get(getRepositoryToken(ConcertScheduleEntity));
     concertSeatRepository = module.get(getRepositoryToken(ConcertSeatEntity));
     concertBookingRepository = module.get(getRepositoryToken(ConcertBookingEntity));
+    eventBus = module.get(EventBus);
   });
 
   afterAll(async () => {
@@ -157,6 +163,38 @@ describe('PayConcertBookingUseCase', () => {
       const failedCount = results.filter(result => result.status === 'rejected').length;
       expect(successCount).toBe(1);
       expect(failedCount).toBe(99);
+    });
+  });
+
+  describe('콘서트 예약 결제 이벤트 테스트', () => {
+    it(`콘서트 예약 결제가 성공적으로 수행되면 이벤트를 1회 발행시켜야 합니다.`, async () => {
+      // Given
+      const spy = jest.spyOn(eventBus, 'publish').mockClear();
+      const user = await createUser('예약자');
+      const booking = await createBookableBooking(user.id);
+      await setPoint(user.id, 100000);
+
+      // When
+      const payment = await payConcertBookingUseCase.execute(new PayConcertBookingUseCaseDTO(user.id, booking.id));
+
+      // Then
+      expect(spy).toHaveBeenCalled();
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect(spy).toHaveBeenCalledWith(new PaymentCompletedEvent(payment, EventTrasactionIdEnum.CONCERT_PAYMENT_COMPLETED));
+    });
+
+    it(`콘서트 예약 결제가 실패하면 이벤트가 발행되지 않아야 합니다.`, async () => {
+      // Given
+      const spy = jest.spyOn(eventBus, 'publish').mockClear();
+      const user = await createUser('예약자');
+
+      // When
+      const exectue = async () => await payConcertBookingUseCase.execute(new PayConcertBookingUseCaseDTO(user.id, -1));
+
+      // Then
+      await expect(exectue).rejects.toThrow();
+      expect(spy).not.toHaveBeenCalled();
+      expect(spy).toHaveBeenCalledTimes(0);
     });
   });
 

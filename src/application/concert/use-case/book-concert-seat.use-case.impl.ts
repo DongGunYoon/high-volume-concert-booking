@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { BookConcertSeatUseCaseDTO } from 'src/application/concert/dto/book-concert-seat.use-case.dto';
 import { BookConcertSeatUseCase } from 'src/domain/concert/interface/use-case/book-concert-seat.use-case';
 import { ConcertBooking } from 'src/domain/concert/model/concert-booking.domain';
+import { BookingService } from 'src/domain/concert/service/booking.service';
 import { ConcertService } from 'src/domain/concert/service/concert.service';
 import { DataSource } from 'typeorm';
 
@@ -9,6 +10,7 @@ import { DataSource } from 'typeorm';
 export class BookConcertSeatUseCaseImpl implements BookConcertSeatUseCase {
   constructor(
     private readonly concertService: ConcertService,
+    private readonly bookingService: BookingService,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -17,7 +19,7 @@ export class BookConcertSeatUseCaseImpl implements BookConcertSeatUseCase {
 
     return await this.dataSource.transaction(async transactionManager => {
       const bookedSeat = await this.concertService.bookSeat(dto.concertSeatId, transactionManager);
-      return await this.concertService.createBooking(dto.toCreateConcertBookingDTO(bookedSeat.concertId, bookedSeat.price), transactionManager);
+      return await this.bookingService.createBooking(dto.toCreateConcertBookingDTO(bookedSeat.concertId, bookedSeat.price), transactionManager);
     });
   }
 }

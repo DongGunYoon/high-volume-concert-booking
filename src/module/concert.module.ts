@@ -34,6 +34,7 @@ import { ScanConcertsUseCaseSymbol } from 'src/domain/concert/interface/use-case
 import { CreateConcertUseCase } from 'src/application/concert/use-case/create-concert.use-case.impl';
 import { CreateConcertScheduleUseCase } from 'src/application/concert/use-case/create-concert-schedule.use-case.impl';
 import { TokenModule } from './token.module';
+import { BookingService } from 'src/domain/concert/service/booking.service';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { TokenModule } from './token.module';
   controllers: [ConcertController],
   providers: [
     ConcertService,
+    BookingService,
     PaymentService,
     CreateConcertUseCase,
     CreateConcertScheduleUseCase,

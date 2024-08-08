@@ -1,8 +1,9 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn, VersionColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn, VersionColumn } from 'typeorm';
 import { ConcertScheduleEntity } from './concert-schedule.entity';
 import { Nullable } from 'src/common/type/native';
 
 @Entity('concert_seats')
+@Index('idx_concert_seat_concert_schedule', ['concertScheduleId'])
 export class ConcertSeatEntity {
   @PrimaryGeneratedColumn()
   id: number;
