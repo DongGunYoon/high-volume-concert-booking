@@ -1,7 +1,8 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { ConcertEntity } from './concert.entity';
 
 @Entity('concert_schedules')
+@Index('idx_concert_schedule_concert', ['concertId'])
 export class ConcertScheduleEntity {
   @PrimaryGeneratedColumn()
   id: number;
