@@ -1,7 +1,7 @@
 import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
 import { DataPlatformService } from 'src/domain/client/data-platform.service';
 import { PaymentCompletedEvent } from '../payment/payment-completed.event';
-import { EventTrasactionIdEnum } from 'src/common/enum/event.enum';
+import { EventTrasactionId } from 'src/common/enum/event.enum';
 
 @EventsHandler(PaymentCompletedEvent)
 export class DataPlatformBookingCompletedHandler implements IEventHandler<PaymentCompletedEvent> {
@@ -11,7 +11,7 @@ export class DataPlatformBookingCompletedHandler implements IEventHandler<Paymen
     try {
       await this.dataPlatformService.sendPaymentResult(event.payment);
     } catch (error) {
-      if (event.transactionId === EventTrasactionIdEnum.CONCERT_PAYMENT_COMPLETED) {
+      if (event.transactionId === EventTrasactionId.CONCERT_PAYMENT_COMPLETED) {
         // 보상 트랜잭션이 존재 시, 작성
       }
     }

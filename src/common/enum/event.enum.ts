@@ -1,4 +1,4 @@
-export enum EventTrasactionIdEnum {
+export enum EventTrasactionId {
   CONCERT_PAYMENT_COMPLETED = 'CONCERT_PAYMENT_COMPLETED',
   CONCERT_BOOKING_COMPLETED = 'CONCERT_BOOKING_COMPLETED',
 }

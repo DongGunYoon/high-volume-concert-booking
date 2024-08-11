@@ -1,7 +1,7 @@
 import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
 import { PaymentCompletedEvent } from '../payment/payment-completed.event';
 import { TokenQueueService } from 'src/domain/token/service/token-queue.service';
-import { EventTrasactionIdEnum } from 'src/common/enum/event.enum';
+import { EventTrasactionId } from 'src/common/enum/event.enum';
 
 @EventsHandler(PaymentCompletedEvent)
 export class TokenPaymentCompletedHandler implements IEventHandler<PaymentCompletedEvent> {
@@ -11,7 +11,7 @@ export class TokenPaymentCompletedHandler implements IEventHandler<PaymentComple
     try {
       await this.tokenQueueService.expire(event.payment.userId);
     } catch (error) {
-      if (event.transactionId === EventTrasactionIdEnum.CONCERT_PAYMENT_COMPLETED) {
+      if (event.transactionId === EventTrasactionId.CONCERT_PAYMENT_COMPLETED) {
         // 보상 트랜잭션이 존재 시, 작성
       }
     }
