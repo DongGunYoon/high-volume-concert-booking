@@ -1,9 +1,9 @@
 import { EventTrasactionId } from 'src/common/enum/event.enum';
-import { ConcertBooking } from 'src/domain/concert/model/concert-booking.domain';
+import { Outbox } from 'src/domain/outbox/model/outbox.domain';
 
 export class BookingCompletedEvent {
   constructor(
-    public readonly booking: ConcertBooking,
+    public readonly outbox: Outbox,
     public readonly transactionId: EventTrasactionId,
   ) {}
 }

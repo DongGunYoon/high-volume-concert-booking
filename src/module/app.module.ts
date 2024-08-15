@@ -15,7 +15,7 @@ import { RedisCacheModule } from './cache.module';
 import { TokenModule } from './token.module';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { CqrsModule } from '@nestjs/cqrs';
-import { ClientModule } from './client.module';
+import { DataPlatformModule } from './data-platform.module';
 
 @Module({
   imports: [
@@ -36,7 +36,7 @@ import { ClientModule } from './client.module';
     UserModule,
     AuthModule,
     LoggerModule,
-    ClientModule,
+    DataPlatformModule,
   ],
   controllers: [],
   providers: [
