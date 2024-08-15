@@ -1,6 +1,8 @@
 import { CreatePaymentDTO } from 'src/domain/concert/dto/create-payment.dto';
 import { PayConcertBookingDTO } from 'src/domain/concert/dto/pay-concert-booking.dto';
 import { ConcertPaymentType } from 'src/domain/concert/enum/concert.enum';
+import { ConcertPayment } from 'src/domain/concert/model/concert-payment.domain';
+import { CreateOutboxDTO } from 'src/domain/outbox/dto/create-outbox.dto';
 import { PayPointDTO } from 'src/domain/point/dto/charge-point.dto';
 import { CreatePointHistoryDTO } from 'src/domain/point/dto/create-point-history.dto';
 import { PointTransactionType } from 'src/domain/point/enum/point.enum';
@@ -46,6 +48,13 @@ export class PayConcertBookingUseCaseDTO {
       concertBookingId: this.concertBookingId,
       price: price,
       type: ConcertPaymentType.BUY,
+    };
+  }
+
+  toCreateOutboxDTO(payment: ConcertPayment): CreateOutboxDTO {
+    return {
+      topic: 'payment.completed',
+      message: JSON.stringify(payment),
     };
   }
 }

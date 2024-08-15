@@ -35,6 +35,12 @@ import { CreateConcertUseCase } from 'src/application/concert/use-case/create-co
 import { CreateConcertScheduleUseCase } from 'src/application/concert/use-case/create-concert-schedule.use-case.impl';
 import { TokenModule } from './token.module';
 import { BookingService } from 'src/domain/concert/service/booking.service';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { BookingKafkaMessageSender } from 'src/infrastructure/kafka/booking/booking.kafka-message-sender';
+import { BookingCompletedHandler } from 'src/event/booking/booking-completed.handler';
+import { PaymentKafkaMessageSender } from 'src/infrastructure/kafka/payment/payment.kafka-message-sender';
+import { PaymentCompletedHandler } from 'src/event/payment/payment-completed.handler';
+import { OutboxModule } from './outbox.module';
 
 @Module({
   imports: [
@@ -43,6 +49,27 @@ import { BookingService } from 'src/domain/concert/service/booking.service';
     UserModule,
     PointModule,
     TokenModule,
+    OutboxModule,
+    ClientsModule.register([
+      {
+        name: 'BOOKING_SERVICE',
+        transport: Transport.KAFKA,
+        options: {
+          client: {
+            brokers: ['localhost:9092'],
+          },
+        },
+      },
+      {
+        name: 'PAYMENT_SERVICE',
+        transport: Transport.KAFKA,
+        options: {
+          client: {
+            brokers: ['localhost:9092'],
+          },
+        },
+      },
+    ]),
   ],
   controllers: [ConcertController],
   providers: [
@@ -61,6 +88,10 @@ import { BookingService } from 'src/domain/concert/service/booking.service';
     { provide: ConcertSeatRepositorySymbol, useClass: ConcertSeatRepositoryImpl },
     { provide: ConcertBookingRepositorySymbol, useClass: ConcertBookingRepositoryImpl },
     { provide: ConcertPaymentRepositorySymbol, useClass: ConcertPaymentRepositoryImpl },
+    BookingKafkaMessageSender,
+    BookingCompletedHandler,
+    PaymentKafkaMessageSender,
+    PaymentCompletedHandler,
   ],
 })
 export class ConcertModule {}
