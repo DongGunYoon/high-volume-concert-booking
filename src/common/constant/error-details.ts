@@ -91,6 +91,10 @@ export const ERROR_DETAILS: Record<ErrorCode, ErrorDetail> = {
     message: '현재 대기열에 진입된 상태가 아닙니다.',
     statusCode: HttpStatus.NOT_FOUND,
   },
+  [ErrorCode.OUTBOX_NOT_FOUND]: {
+    message: '아웃박스 정보가 존재하지 않습니다.',
+    statusCode: HttpStatus.NOT_FOUND,
+  },
   [ErrorCode.OPTIMISTIC_LOCK_CONFLICT]: {
     message: '동시 요청으로 인해 작업을 완료할 수 없습니다. 잠시 후 다시 시도해 주세요.',
     statusCode: HttpStatus.CONFLICT,

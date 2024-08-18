@@ -3,23 +3,14 @@ import { ConcertPaymentRepository, ConcertPaymentRepositorySymbol } from '../int
 import { ConcertPayment } from '../model/concert-payment.domain';
 import { CreatePaymentDTO } from '../dto/create-payment.dto';
 import { EntityManager } from 'typeorm';
-import { EventBus } from '@nestjs/cqrs';
-import { EventTrasactionId } from 'src/common/enum/event.enum';
-import { PaymentCompletedEvent } from 'src/event/payment/payment-completed.event';
 
 @Injectable()
 export class PaymentService {
-  constructor(
-    @Inject(ConcertPaymentRepositorySymbol) private readonly concertPaymentRepository: ConcertPaymentRepository,
-    private readonly eventBus: EventBus,
-  ) {}
+  constructor(@Inject(ConcertPaymentRepositorySymbol) private readonly concertPaymentRepository: ConcertPaymentRepository) {}
 
   async create(dto: CreatePaymentDTO, entityManager: EntityManager): Promise<ConcertPayment> {
-    let payment = ConcertPayment.create(dto);
-    payment = await this.concertPaymentRepository.save(payment, entityManager);
+    const payment = ConcertPayment.create(dto);
 
-    this.eventBus.publish(new PaymentCompletedEvent(payment, EventTrasactionId.CONCERT_PAYMENT_COMPLETED));
-
-    return payment;
+    return await this.concertPaymentRepository.save(payment, entityManager);
   }
 }
