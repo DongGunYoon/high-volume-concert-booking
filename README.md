@@ -2,6 +2,16 @@
 
 대용량 트래픽이 예상되는 콘서트 예약 시스템을 위한 백엔드 애플리케이션입니다. 본 시스템은 다수의 서버 인스턴스 환경에서도 동시성 문제를 방지하고 안정적으로 작동할 수 있도록 설계되었습니다. 대기열을 이용한 유저 유입량 조절을 통해 서버 부하를 줄이고 효율적인 콘서트 예약 기능을 지원합니다.
 
+## 관련 분석 문서
+
+- [동시성 문제 분석](docs/concurrency-issue.md)
+- [Redis를 활용한 대기열 시스템 이관](docs/waiting-queue-redis.md)
+- [쿼리 분석 및 캐싱 전략 설계](docs/cache.md)
+- [DB Index를 통한 성능 개선](docs/database-index.md)
+- [트랜잭션의 문제와 해결방안](docs/msa-transaction.md)
+- [Kafka를 통한 EDA 적용](docs/kafka-eda.md)
+- [부하테스트 및 장애 대응](docs/load-test-and-incident-response.md)
+
 ## 주요 기능
 
 - 대기열 시스템: 동시성 문제 해결을 위한 유저 대기열 관리
